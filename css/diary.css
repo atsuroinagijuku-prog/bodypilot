@@ -1,0 +1,788 @@
+/* ===== Diary Page Styles ===== */
+
+/* App Navigation Bar */
+.app-nav {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  background: var(--white);
+  border-bottom: 2px solid var(--border);
+  padding: 0;
+  position: sticky;
+  top: 60px;
+  z-index: 90;
+}
+
+.app-nav-item {
+  padding: 12px 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-light);
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.app-nav-item:hover {
+  color: var(--green);
+  background: var(--green-bg);
+}
+
+.app-nav-item.active {
+  color: var(--green);
+  border-bottom-color: var(--green);
+  background: var(--green-bg);
+}
+
+/* Diary Page Layout */
+.diary-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 16px;
+}
+
+.diary-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* Diary Header */
+.diary-header {
+  margin-bottom: 16px;
+}
+
+.diary-header h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Write Button */
+.diary-write-btn {
+  display: block;
+  width: 100%;
+  padding: 14px 24px;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-bottom: 20px;
+}
+
+.diary-write-btn:hover {
+  background: var(--green-light);
+  transform: translateY(-1px);
+}
+
+.diary-write-btn:active {
+  transform: translateY(0);
+}
+
+/* Diary Sections */
+.diary-section {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.diary-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--green-bg);
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.diary-section-header h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--green);
+  margin: 0;
+}
+
+.section-edit-link {
+  font-size: 0.8rem;
+  color: var(--green);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.section-edit-link:hover {
+  text-decoration: underline;
+}
+
+/* Diary form header (green bg) */
+.diary-form-header {
+  background: var(--green);
+}
+
+.diary-form-header h3 {
+  color: #fff;
+}
+
+/* Date display inside section */
+.diary-section-date {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  padding: 10px 16px;
+  background: var(--cream);
+  border-bottom: 1px solid var(--border);
+}
+
+.diary-section-body {
+  padding: 16px;
+}
+
+/* Food Chart Table */
+.food-chart-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  font-size: 0.88rem;
+}
+
+.food-chart-table th {
+  padding: 8px 12px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-sub);
+  border-bottom: 2px solid var(--border);
+  font-size: 0.8rem;
+}
+
+.food-chart-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.food-chart-table .fc-label {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.food-chart-table .fc-goal {
+  text-align: center;
+  color: var(--text-sub);
+}
+
+.food-chart-table .fc-arrow-col {
+  width: 30px;
+  text-align: center;
+}
+
+.food-chart-table .fc-arrow {
+  text-align: center;
+  color: var(--text-light);
+  font-size: 0.85rem;
+}
+
+.food-chart-table .fc-actual {
+  text-align: center;
+  font-weight: 600;
+  color: var(--green);
+}
+
+/* Summary */
+.fc-summary {
+  padding: 10px 0;
+  font-size: 0.88rem;
+  color: var(--text-sub);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+/* Meals Section */
+.fc-meals {
+  margin-bottom: 16px;
+}
+
+.fc-meal-group {
+  display: flex;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.fc-meal-type {
+  width: 40px;
+  font-weight: 700;
+  color: var(--green);
+  flex-shrink: 0;
+  padding-right: 8px;
+}
+
+.fc-meal-items {
+  flex: 1;
+  color: var(--text-sub);
+}
+
+.fc-meal-item {
+  margin-bottom: 2px;
+}
+
+.fc-unrecorded {
+  color: var(--text-light);
+  font-style: italic;
+}
+
+.fc-total {
+  padding: 10px 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: right;
+}
+
+/* Balance Tabs */
+.fc-balance-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.fc-tab {
+  flex: 1;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-light);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+
+.fc-tab.active {
+  color: var(--green);
+  border-bottom-color: var(--green);
+}
+
+.fc-tab-panel {
+  display: none;
+}
+
+.fc-tab-panel.active {
+  display: block;
+}
+
+/* Nutrition Bars */
+.nutrition-bars .nutrition-row,
+.nutrition-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.nutrition-label {
+  width: 80px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-sub);
+  flex-shrink: 0;
+}
+
+.nutrition-bar {
+  flex: 1;
+  height: 12px;
+  background: var(--cream-dark);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.nutrition-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.4s ease;
+}
+
+.nutrition-fill.cal { background: var(--green); }
+.nutrition-fill.protein { background: #5BA4CF; }
+.nutrition-fill.fat { background: #E8A838; }
+.nutrition-fill.carb { background: #C75B8E; }
+.nutrition-fill.over { background: #E85050; }
+
+.nutrition-value {
+  font-size: 0.75rem;
+  color: var(--text-sub);
+  min-width: 80px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Detail Rows */
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Incomplete Message */
+.fc-incomplete-msg {
+  text-align: center;
+  padding: 12px;
+  background: #FFF8E1;
+  border-radius: var(--radius);
+  color: #B8860B;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 12px;
+}
+
+[data-theme="dark"] .fc-incomplete-msg {
+  background: #3A3020;
+  color: #D4A846;
+}
+
+/* Exercise Section */
+.exercise-unrecorded {
+  display: block;
+  padding: 12px;
+  color: var(--green);
+  font-weight: 600;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.exercise-unrecorded:hover {
+  text-decoration: underline;
+}
+
+.exercise-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.exercise-name {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.exercise-detail {
+  color: var(--text-sub);
+}
+
+.exercise-rate-summary {
+  padding: 10px 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: right;
+}
+
+/* Diary Form */
+.diary-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.diary-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.diary-form-field label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+
+.diary-input-unit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.diary-input-unit input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: var(--input-bg);
+  color: var(--text);
+}
+
+.diary-input-unit input:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 2px rgba(123, 139, 46, 0.15);
+}
+
+.diary-input-unit .unit {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+  font-weight: 600;
+}
+
+/* Radio Group */
+.diary-radio-group {
+  display: flex;
+  gap: 16px;
+}
+
+.diary-radio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.diary-radio input[type="radio"] {
+  accent-color: var(--green);
+  width: 16px;
+  height: 16px;
+}
+
+/* Bowel note */
+.bowel-note {
+  font-size: 0.72rem;
+  color: var(--text-light);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* Select */
+.diary-select {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--input-bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.diary-select:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 2px rgba(123, 139, 46, 0.15);
+}
+
+/* Text Area */
+.diary-text-field {
+  margin-bottom: 16px;
+}
+
+.diary-text-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  line-height: 1.6;
+  resize: vertical;
+  background: var(--input-bg);
+  color: var(--text);
+}
+
+.diary-text-field textarea:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 2px rgba(123, 139, 46, 0.15);
+}
+
+.text-count {
+  font-weight: 400;
+  color: var(--text-light);
+  font-size: 0.78rem;
+}
+
+/* Submit Button */
+.diary-form-actions {
+  text-align: right;
+}
+
+.diary-submit-btn {
+  padding: 10px 32px;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.diary-submit-btn:hover {
+  background: var(--green-light);
+  transform: translateY(-1px);
+}
+
+.diary-submit-btn:active {
+  transform: translateY(0);
+}
+
+/* ===== Right Sidebar ===== */
+.diary-sidebar {
+  position: sticky;
+  top: 120px;
+}
+
+.monthly-table-wrapper {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.monthly-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--green);
+  color: #fff;
+}
+
+.month-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.month-nav-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.month-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Monthly Table */
+.monthly-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+}
+
+.monthly-table thead th {
+  padding: 6px 4px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-sub);
+  background: var(--green-bg);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.7rem;
+}
+
+.monthly-table tbody tr {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.monthly-table tbody tr:hover {
+  background: var(--green-bg);
+}
+
+.monthly-table tbody td {
+  padding: 5px 4px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.monthly-table .mt-date {
+  font-weight: 600;
+  white-space: nowrap;
+  text-align: left;
+  padding-left: 8px;
+}
+
+.monthly-table .mt-weight {
+  font-weight: 600;
+}
+
+/* Row states */
+.monthly-row.today {
+  background: var(--green-bg);
+}
+
+.monthly-row.today td {
+  font-weight: 700;
+}
+
+.monthly-row.selected {
+  background: rgba(123, 139, 46, 0.15);
+  outline: 2px solid var(--green);
+  outline-offset: -2px;
+}
+
+.monthly-row.sunday .mt-date {
+  color: #D44;
+}
+
+.monthly-row.saturday .mt-date {
+  color: #48A;
+}
+
+/* Health score colors */
+.health-good {
+  color: var(--green);
+  font-weight: 700;
+}
+
+.health-ok {
+  color: #E8A838;
+  font-weight: 600;
+}
+
+.health-bad {
+  color: #E85050;
+  font-weight: 600;
+}
+
+.mt-new {
+  color: var(--green);
+  font-weight: 600;
+  font-size: 0.68rem;
+}
+
+.mt-unrecorded {
+  color: var(--text-light);
+  font-size: 0.68rem;
+}
+
+.mt-recorded {
+  color: var(--green);
+  font-weight: 600;
+  font-size: 0.68rem;
+}
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed;
+  bottom: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--green);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: var(--radius-pill);
+  font-size: 0.88rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  transition: bottom 0.3s ease;
+  z-index: 9999;
+}
+
+.toast.show {
+  bottom: 30px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .diary-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .diary-sidebar {
+    position: static;
+  }
+
+  .app-nav {
+    overflow-x: auto;
+    justify-content: flex-start;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app-nav-item {
+    padding: 10px 14px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .diary-page {
+    padding: 12px 8px;
+  }
+
+  .diary-form-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .food-chart-table {
+    font-size: 0.82rem;
+  }
+
+  .monthly-table {
+    font-size: 0.68rem;
+  }
+
+  .monthly-table thead th {
+    font-size: 0.65rem;
+    padding: 4px 2px;
+  }
+
+  .monthly-table tbody td {
+    padding: 4px 2px;
+  }
+}
+
+/* ===== Dark Mode ===== */
+[data-theme="dark"] .diary-write-btn {
+  background: var(--green);
+}
+
+[data-theme="dark"] .diary-write-btn:hover {
+  background: var(--green-light);
+}
+
+[data-theme="dark"] .monthly-table-header {
+  background: var(--green);
+}
+
+[data-theme="dark"] .diary-form-header {
+  background: var(--green);
+}
+
+[data-theme="dark"] .diary-input-unit input,
+[data-theme="dark"] .diary-select,
+[data-theme="dark"] .diary-text-field textarea {
+  background: var(--cream-dark);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+[data-theme="dark"] .nutrition-bar {
+  background: var(--cream-dark);
+}
+
+[data-theme="dark"] .diary-section-date {
+  background: var(--cream-dark);
+}

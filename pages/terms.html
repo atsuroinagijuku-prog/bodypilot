@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>利用規約 - BodyPilot</title>
+  <meta name="description" content="BodyPilot利用規約 - サービスの利用条件についてご確認ください。">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#7B8B2E">
+  <link rel="icon" type="image/svg+xml" href="../images/icon-192.svg">
+  <link rel="stylesheet" href="../css/style.css">
+  <script>
+    (function() {
+      var saved = localStorage.getItem('bp_theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+  <style>
+    .legal-page { max-width: 800px; margin: 0 auto; padding: 40px 20px 80px; }
+    .legal-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
+    .legal-header .back-link { color: var(--green); text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+    .legal-header .back-link:hover { text-decoration: underline; }
+    .legal-page h1 { font-size: 1.6rem; margin-bottom: 8px; color: var(--text); font-weight: 800; }
+    .legal-updated { font-size: 0.82rem; color: var(--text-sub); margin-bottom: 32px; }
+    .legal-toc { background: var(--cream); border-radius: 12px; padding: 20px 24px; margin-bottom: 36px; }
+    .legal-toc h2 { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+    .legal-toc ol { padding-left: 20px; margin: 0; }
+    .legal-toc li { margin-bottom: 6px; }
+    .legal-toc a { color: var(--green); text-decoration: none; font-size: 0.85rem; line-height: 1.6; }
+    .legal-toc a:hover { text-decoration: underline; }
+    .legal-section { margin-bottom: 32px; }
+    .legal-section h2 { font-size: 1.15rem; font-weight: 700; color: var(--text); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--green-pale); }
+    .legal-section p, .legal-section li { line-height: 1.9; color: var(--text-sub); font-size: 0.9rem; margin-bottom: 10px; }
+    .legal-section ul { padding-left: 20px; margin-bottom: 12px; }
+    .legal-section ul li { margin-bottom: 6px; }
+    .legal-footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center; }
+    .legal-footer a { color: var(--green); text-decoration: none; font-weight: 600; }
+    .legal-footer a:hover { text-decoration: underline; }
+    [data-theme="dark"] .legal-toc { background: var(--card-bg, #1e1e1e); }
+  </style>
+</head>
+<body>
+  <div class="legal-page">
+    <div class="legal-header">
+      <a href="../index.html" class="back-link">&larr; トップページに戻る</a>
+    </div>
+    <div class="logo" style="margin-bottom: 24px;">
+      <span class="logo-icon">B</span>
+      Body<span class="logo-accent">Pilot</span>
+    </div>
+    <h1>利用規約</h1>
+    <p class="legal-updated">最終更新日: 2026年3月13日</p>
+
+    <nav class="legal-toc">
+      <h2>目次</h2>
+      <ol>
+        <li><a href="#overview">サービスの概要</a></li>
+        <li><a href="#conditions">利用条件</a></li>
+        <li><a href="#account">アカウント</a></li>
+        <li><a href="#prohibited">禁止事項</a></li>
+        <li><a href="#disclaimer">免責事項</a></li>
+        <li><a href="#data">データの取り扱い</a></li>
+        <li><a href="#changes">変更について</a></li>
+        <li><a href="#contact">お問い合わせ</a></li>
+      </ol>
+    </nav>
+
+    <section class="legal-section" id="overview">
+      <h2>第1条 サービスの概要</h2>
+      <p>BodyPilot（以下「当サービス」）は、食事記録、カロリー・栄養素計算、体重管理、運動記録などの健康管理機能を提供するウェブアプリケーションです。</p>
+      <p>当サービスはクライアントサイドで動作するデモアプリケーションであり、食事データや健康情報はお使いのブラウザのlocalStorageに保存されます。基本的にサーバーへのデータ送信は行いません。</p>
+      <p>当サービスで提供される栄養情報やアドバイスは一般的な参考情報であり、医療上の助言を構成するものではありません。健康上の判断は、必ず専門の医療従事者にご相談ください。</p>
+    </section>
+
+    <section class="legal-section" id="conditions">
+      <h2>第2条 利用条件</h2>
+      <p>本規約は、当サービスのすべての利用者に適用されます。当サービスを利用することにより、本規約に同意したものとみなされます。</p>
+      <ul>
+        <li>当サービスは無料でご利用いただけます。</li>
+        <li>ご利用にはJavaScriptが有効なモダンブラウザ（Chrome、Safari、Firefox、Edge等の最新版）が必要です。</li>
+        <li>当サービスはPWA（Progressive Web App）として動作し、オフラインでも一部機能がご利用いただけます。</li>
+        <li>ブラウザのlocalStorageを使用するため、ストレージ容量の制限（通常5〜10MB）があります。</li>
+      </ul>
+    </section>
+
+    <section class="legal-section" id="account">
+      <h2>第3条 アカウント</h2>
+      <p>当サービスでは、利用開始時にアカウント登録が必要です。アカウント情報はブラウザのlocalStorageに保存されます。</p>
+      <ul>
+        <li>登録情報は正確かつ最新の情報をご提供ください。</li>
+        <li>パスワードの管理はご自身の責任で行ってください。</li>
+        <li>アカウント情報はブラウザのローカルストレージに保存されるため、ブラウザのデータを消去するとアカウント情報が失われます。</li>
+        <li>1つのブラウザで複数のアカウントを作成することが可能です。</li>
+      </ul>
+    </section>
+
+    <section class="legal-section" id="prohibited">
+      <h2>第4条 禁止事項</h2>
+      <p>当サービスの利用にあたり、以下の行為を禁止します。</p>
+      <ul>
+        <li>当サービスのソースコードの改ざんや、不正なアクセスを試みる行為</li>
+        <li>当サービスを利用した違法行為や、第三者の権利を侵害する行為</li>
+        <li>当サービスの運営を妨害する行為</li>
+        <li>当サービスを商業目的で無断利用する行為</li>
+        <li>虚偽の情報を登録または流布する行為</li>
+        <li>その他、運営者が不適切と判断する行為</li>
+      </ul>
+    </section>
+
+    <section class="legal-section" id="disclaimer">
+      <h2>第5条 免責事項</h2>
+      <p>当サービスの利用に関して、以下の事項についてご了承ください。</p>
+      <ul>
+        <li>当サービスで表示されるカロリー・栄養素の数値は推定値であり、正確性を保証するものではありません。</li>
+        <li>AI分析による食品認識の結果は参考値であり、実際の値と異なる場合があります。</li>
+        <li>当サービスの利用により生じた健康上の問題やデータの損失について、運営者は一切の責任を負いません。</li>
+        <li>ブラウザのlocalStorageに保存されたデータは、ブラウザのデータ消去、端末の変更などにより失われる場合があります。</li>
+        <li>当サービスは予告なくメンテナンスや機能変更を行う場合があります。</li>
+        <li>当サービスの提供を予告なく中止する場合があります。</li>
+      </ul>
+    </section>
+
+    <section class="legal-section" id="data">
+      <h2>第6条 データの取り扱い</h2>
+      <p>当サービスにおけるデータの取り扱いについて、以下の通りご説明します。</p>
+      <ul>
+        <li>食事記録、体重データ、目標設定などのユーザーデータは、すべてお使いのブラウザのlocalStorageに保存されます。</li>
+        <li>基本的に、ユーザーデータが外部サーバーに送信されることはありません。</li>
+        <li>OpenAI APIキーを設定した場合、食事写真の分析時にOpenAIのサーバーにデータが送信されます。この場合、OpenAIの利用規約およびプライバシーポリシーが適用されます。</li>
+        <li>データのエクスポート機能を利用して、ご自身のデータをJSON形式でダウンロードすることができます。</li>
+        <li>アカウント削除により、すべてのローカルデータが完全に削除されます。</li>
+      </ul>
+      <p>詳しくは<a href="privacy.html" style="color:var(--green);">プライバシーポリシー</a>をご参照ください。</p>
+    </section>
+
+    <section class="legal-section" id="changes">
+      <h2>第7条 変更について</h2>
+      <p>運営者は、必要と判断した場合、ユーザーに事前の通知なく本規約を変更することができるものとします。</p>
+      <p>変更後の利用規約は、当サービス上に表示した時点で効力を生じるものとし、ユーザーが変更後に当サービスを利用した場合、変更後の規約に同意したものとみなします。</p>
+      <p>重大な変更がある場合は、当サービス上での告知やアプリ内通知によりお知らせいたします。</p>
+    </section>
+
+    <section class="legal-section" id="contact">
+      <h2>第8条 お問い合わせ</h2>
+      <p>本規約に関するお問い合わせは、以下の連絡先までお願いいたします。</p>
+      <p>サービス名: BodyPilot<br>
+      メール: support@bodypilot.app</p>
+    </section>
+
+    <div class="legal-footer">
+      <a href="../index.html">&larr; トップページに戻る</a>
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      <a href="privacy.html">プライバシーポリシー</a>
+    </div>
+  </div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/main.js" defer></script>
+</body>
+</html>

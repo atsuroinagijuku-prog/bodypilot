@@ -4,97 +4,154 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ダッシュボード - BodyPilot</title>
+  <meta name="description" content="BodyPilotダッシュボード - 今日の食事記録、カロリー・栄養素バランスを確認。">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#7B8B2E">
+  <link rel="icon" type="image/svg+xml" href="../images/icon-192.svg">
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/dashboard.css">
+  <script>
+    (function() {
+      var saved = localStorage.getItem('bp_theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    })();
+  </script>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">メインコンテンツにスキップ</a>
   <!-- ヘッダー -->
   <header class="header">
     <div class="header-inner">
-      <a href="dashboard.html" class="logo">
+      <a href="dashboard.html" class="logo" aria-label="BodyPilot ダッシュボード">
         <span class="logo-icon">B</span>
         Body<span class="logo-accent">Pilot</span>
       </a>
-      <nav class="nav">
-        <a href="dashboard.html" style="color:var(--green); font-weight:700;">ダッシュボード</a>
-        <a href="#">レポート</a>
-        <a href="#">設定</a>
-        <a href="#" onclick="handleLogout(); return false;">ログアウト</a>
+      <nav class="nav" role="navigation" aria-label="ダッシュボードナビゲーション">
+        <a href="dashboard.html" style="color:var(--green); font-weight:700;" data-i18n="nav.dashboard">ダッシュボード</a>
+        <a href="planner.html">プランナー</a>
+        <a href="reports.html" data-i18n="nav.reports">レポート</a>
+        <a href="settings.html" data-i18n="nav.settings">設定</a>
+        <a href="#" onclick="handleLogout(); return false;" data-i18n="nav.logout">ログアウト</a>
       </nav>
-      <button class="hamburger" id="hamburger">
+      <button class="hamburger" id="hamburger" aria-label="メニューを開く" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
     </div>
   </header>
 
-  <main class="dashboard">
+  <main class="dashboard" role="main" id="main-content">
+    <!-- Gamification Bar -->
+    <div class="gamification-bar">
+      <div class="level-display">
+        <span class="level-badge" id="level-badge">Lv.1</span>
+        <span class="level-name" id="level-name">ビギナー</span>
+      </div>
+      <div class="streak-display">
+        <span class="streak-fire">&#128293;</span>
+        <span id="streak-count">0</span>日連続
+      </div>
+      <div class="challenge-mini" id="challenge-mini" onclick="showChallengeDetail()">
+        週間チャレンジ: <span id="challenge-name"></span>
+        <div class="challenge-progress-mini">
+          <div class="challenge-fill-mini" id="challenge-fill"></div>
+        </div>
+      </div>
+      <button class="badges-btn" onclick="showBadgesModal()">&#127941; バッジ</button>
+    </div>
+
     <div class="dashboard-header">
       <div>
         <h2><span id="user-name"></span> の食事記録</h2>
-        <span class="date-display" id="today-date"></span>
+        <!-- 4.4 日付ナビゲーション -->
+        <div class="date-nav">
+          <button class="date-nav-btn" id="date-prev" title="前日" aria-label="前日へ移動">&#8592;</button>
+          <span class="date-display" id="today-date"></span>
+          <button class="date-nav-btn" id="date-next" title="翌日" aria-label="翌日へ移動">&#8594;</button>
+          <button class="date-nav-today" id="date-today" aria-label="今日に戻る">今日</button>
+        </div>
       </div>
-      <div class="health-score-badge">
+      <!-- 4.5 健康スコア (内訳ツールチップ付き) -->
+      <div class="health-score-badge" id="health-score-badge" aria-label="健康スコア" tabindex="0">
         <span class="score-label">健康スコア</span>
         <span class="score-num" id="health-score">0</span>
         <span class="score-unit">点</span>
+        <div class="score-breakdown" id="score-breakdown" style="display:none;" role="tooltip"></div>
       </div>
     </div>
 
     <!-- サマリーカード -->
     <div class="summary-cards">
       <div class="summary-card">
-        <div class="label">摂取カロリー</div>
+        <div class="label" data-i18n="dashboard.intake">摂取カロリー</div>
         <div class="value" id="sum-cal">0</div>
         <div class="unit" id="sum-cal-goal">/ 2,000 kcal</div>
       </div>
       <div class="summary-card">
-        <div class="label">タンパク質</div>
+        <div class="label" data-i18n="dashboard.protein">タンパク質</div>
         <div class="value" id="sum-protein">0</div>
         <div class="unit" id="sum-protein-goal">/ 80 g</div>
       </div>
       <div class="summary-card">
-        <div class="label">脂質</div>
+        <div class="label" data-i18n="dashboard.fat">脂質</div>
         <div class="value" id="sum-fat">0</div>
         <div class="unit" id="sum-fat-goal">/ 65 g</div>
       </div>
       <div class="summary-card">
-        <div class="label">炭水化物</div>
+        <div class="label" data-i18n="dashboard.carbs">炭水化物</div>
         <div class="value" id="sum-carb">0</div>
         <div class="unit" id="sum-carb-goal">/ 250 g</div>
       </div>
     </div>
 
+    <!-- ネットカロリー表示 -->
+    <div class="net-calories-bar" id="net-calories-display" aria-label="ネットカロリー">
+      摂取 0 - 消費 0 = ネット <strong>0</strong> kcal
+    </div>
+
     <div class="dashboard-grid">
       <!-- 左カラム: 食事記録 -->
       <div class="card">
-        <div class="card-title">食事を記録する</div>
+        <div class="card-title" data-i18n="dashboard.recordMeal">食事を記録する</div>
 
         <!-- タブ -->
-        <div class="record-tabs">
-          <button class="record-tab active" onclick="switchTab('photo')">写真で記録</button>
-          <button class="record-tab" onclick="switchTab('search')">食品を検索</button>
+        <div class="record-tabs" role="tablist" aria-label="記録方法の切り替え">
+          <button class="record-tab active" role="tab" aria-selected="true" aria-controls="tab-photo" onclick="switchTab('photo')" id="tab-btn-photo" aria-label="写真で記録" data-i18n="dashboard.photo">写真で記録</button>
+          <button class="record-tab" role="tab" aria-selected="false" aria-controls="tab-barcode" onclick="switchTab('barcode')" id="tab-btn-barcode" aria-label="バーコード" data-i18n="dashboard.barcode">バーコード</button>
+          <button class="record-tab" role="tab" aria-selected="false" aria-controls="tab-search" onclick="switchTab('search')" id="tab-btn-search" aria-label="食品を検索" data-i18n="dashboard.searchFood">食品を検索</button>
         </div>
 
         <!-- 写真撮影 -->
-        <div id="tab-photo" class="tab-content active">
-          <div class="upload-area" id="upload-area">
-            <div class="upload-icon">📷</div>
+        <div id="tab-photo" class="tab-content active" role="tabpanel">
+          <div class="upload-area" id="upload-area" role="button" tabindex="0" aria-label="写真を撮影またはアップロード">
+            <div class="upload-icon" aria-hidden="true">&#128247;</div>
             <p>写真を撮影またはアップロード</p>
             <p class="upload-hint">タップでカメラ起動、またはファイルを選択</p>
-            <input type="file" id="file-input" accept="image/*" capture="environment" style="display:none;">
+            <input type="file" id="file-input" accept="image/*" capture="environment" style="display:none;" aria-label="食事の写真を選択">
           </div>
 
-          <div id="analyzing" style="display:none; text-align:center; padding:36px;">
-            <div class="spinner"></div>
+          <div id="analyzing" style="display:none; text-align:center; padding:36px;" role="status" aria-live="polite">
+            <div class="spinner" aria-hidden="true"></div>
             <p style="margin-top:12px; color:var(--text-sub);">AIが分析中...</p>
           </div>
 
           <div id="photo-result" style="display:none;">
             <div class="photo-result-card">
-              <img id="preview-img" src="" alt="撮影した写真" class="preview-image">
+              <img id="preview-img" src="" alt="撮影した食事の写真" class="preview-image">
               <div class="result-details">
                 <h3 id="photo-food-name"></h3>
                 <div class="result-weight">推定重量: <strong id="photo-food-weight"></strong></div>
+                <!-- 4.2 食事タイプ選択 (写真結果) -->
+                <div class="meal-type-selector">
+                  <label for="photo-meal-type">食事タイプ:</label>
+                  <select id="photo-meal-type" class="meal-type-select">
+                    <option value="朝食">朝食</option>
+                    <option value="昼食">昼食</option>
+                    <option value="間食">間食</option>
+                    <option value="夕食">夕食</option>
+                  </select>
+                </div>
                 <div class="result-nutrients">
                   <div class="rn-item"><span class="rn-label">カロリー</span><span class="rn-value" id="photo-food-cal"></span></div>
                   <div class="rn-item"><span class="rn-label">タンパク質</span><span class="rn-value" id="photo-food-protein"></span></div>
@@ -102,54 +159,143 @@
                   <div class="rn-item"><span class="rn-label">炭水化物</span><span class="rn-value" id="photo-food-carb"></span></div>
                 </div>
                 <div class="result-actions">
-                  <button class="btn btn-primary btn-sm" id="btn-save-photo" onclick="savePhotoResult()">記録する</button>
-                  <button class="btn btn-outline-white btn-sm" onclick="resetUpload()">やり直す</button>
+                  <button class="btn btn-primary btn-sm" id="btn-save-photo" onclick="savePhotoResult()" aria-label="この食事を記録する">記録する</button>
+                  <button class="btn btn-outline-white btn-sm" onclick="resetUpload()" aria-label="撮影をやり直す">やり直す</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- バーコードスキャン -->
+        <div id="tab-barcode" class="tab-content" role="tabpanel">
+          <div class="barcode-scanner">
+            <p class="barcode-instruction">商品のバーコードをカメラにかざしてください</p>
+            <div id="barcode-viewport" class="barcode-viewport"></div>
+            <div class="barcode-actions">
+              <button onclick="startBarcodeScanner()" class="btn btn-primary" id="barcode-start-btn">スキャン開始</button>
+              <button onclick="stopBarcodeScanner()" class="btn btn-secondary" id="barcode-stop-btn" style="display:none">停止</button>
+            </div>
+            <div id="barcode-result" style="display:none">
+              <div class="barcode-result-card">
+                <p class="barcode-code-display">バーコード: <span id="barcode-value"></span></p>
+                <div id="barcode-food-info"></div>
+              </div>
+            </div>
+            <!-- 手動入力フォーム (バーコード未登録時) -->
+            <div id="barcode-manual-form" style="display:none">
+              <h4 class="barcode-manual-title">商品が見つかりませんでした。手動で入力してください。</h4>
+              <div class="barcode-manual-fields">
+                <div class="form-group">
+                  <label for="barcode-manual-name">商品名</label>
+                  <input type="text" id="barcode-manual-name" placeholder="商品名を入力">
+                </div>
+                <div class="barcode-manual-grid">
+                  <div class="form-group">
+                    <label for="barcode-manual-cal">カロリー (kcal)</label>
+                    <input type="number" id="barcode-manual-cal" placeholder="0" min="0">
+                  </div>
+                  <div class="form-group">
+                    <label for="barcode-manual-protein">タンパク質 (g)</label>
+                    <input type="number" id="barcode-manual-protein" placeholder="0" min="0" step="0.1">
+                  </div>
+                  <div class="form-group">
+                    <label for="barcode-manual-fat">脂質 (g)</label>
+                    <input type="number" id="barcode-manual-fat" placeholder="0" min="0" step="0.1">
+                  </div>
+                  <div class="form-group">
+                    <label for="barcode-manual-carb">炭水化物 (g)</label>
+                    <input type="number" id="barcode-manual-carb" placeholder="0" min="0" step="0.1">
+                  </div>
+                  <div class="form-group">
+                    <label for="barcode-manual-fiber">食物繊維 (g)</label>
+                    <input type="number" id="barcode-manual-fiber" placeholder="0" min="0" step="0.1">
+                  </div>
+                  <div class="form-group">
+                    <label for="barcode-manual-weight">内容量 (g)</label>
+                    <input type="number" id="barcode-manual-weight" placeholder="100" min="1">
+                  </div>
+                </div>
+                <div class="meal-type-selector">
+                  <label for="barcode-manual-meal-type">食事タイプ:</label>
+                  <select id="barcode-manual-meal-type" class="meal-type-select">
+                    <option value="朝食">朝食</option>
+                    <option value="昼食">昼食</option>
+                    <option value="間食">間食</option>
+                    <option value="夕食">夕食</option>
+                  </select>
+                </div>
+                <button class="btn btn-primary" onclick="saveBarcodeManual()">記録する</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- 食品検索 -->
-        <div id="tab-search" class="tab-content">
-          <div class="search-box">
-            <input type="text" id="food-search" placeholder="食品名を入力（例: おにぎり、唐揚げ）">
+        <div id="tab-search" class="tab-content" role="tabpanel">
+          <div class="search-box" style="display:flex;gap:8px;align-items:center;">
+            <label for="food-search" class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">食品名を入力</label>
+            <input type="text" id="food-search" placeholder="食品名を入力（例: おにぎり、唐揚げ、gohan）" aria-label="食品名を入力して検索" style="flex:1;">
+            <button onclick="showCustomFoodForm()" class="btn btn-primary btn-sm" style="white-space:nowrap;font-size:0.78rem;" aria-label="カスタム食品を登録">+ 食品を登録</button>
           </div>
-          <div class="search-tabs">
-            <button class="search-tab active" data-category="all">人気順</button>
-            <button class="search-tab" data-category="ごはん">ごはん</button>
-            <button class="search-tab" data-category="めん">めん</button>
-            <button class="search-tab" data-category="肉">肉</button>
-            <button class="search-tab" data-category="魚">魚</button>
-            <button class="search-tab" data-category="サラダ">サラダ</button>
+          <div class="search-tabs" role="tablist" aria-label="食品カテゴリー">
+            <button class="search-tab active" data-category="all" aria-label="人気順で表示">人気順</button>
+            <button class="search-tab" data-category="ごはん" aria-label="ごはんカテゴリー">ごはん</button>
+            <button class="search-tab" data-category="めん" aria-label="めんカテゴリー">めん</button>
+            <button class="search-tab" data-category="パン" aria-label="パンカテゴリー">パン</button>
+            <button class="search-tab" data-category="肉" aria-label="肉カテゴリー">肉</button>
+            <button class="search-tab" data-category="魚" aria-label="魚カテゴリー">魚</button>
+            <button class="search-tab" data-category="野菜" aria-label="野菜カテゴリー">野菜</button>
+            <button class="search-tab" data-category="飲料" aria-label="飲料カテゴリー">飲料</button>
+            <button class="search-tab" data-category="コンビニ" aria-label="コンビニカテゴリー">コンビニ</button>
+            <button class="search-tab" data-category="ファストフード" aria-label="ファストフードカテゴリー">ファストフード</button>
+            <button class="search-tab" data-category="デザート" aria-label="デザートカテゴリー">デザート</button>
+            <button class="search-tab" data-category="サラダ" aria-label="サラダカテゴリー">サラダ</button>
+            <button class="search-tab" data-category="カスタム" aria-label="カスタムカテゴリー">カスタム</button>
           </div>
-          <div id="search-results" class="search-results"></div>
+          <div id="search-results" class="search-results" role="list" aria-label="検索結果"></div>
         </div>
       </div>
 
-      <!-- 右カラム: 栄養バランス & 体重 -->
+      <!-- 右カラム: アドバイス & 栄養バランス & 体重 -->
       <div style="display:flex; flex-direction:column; gap:16px;">
+        <!-- AIアドバイスカード -->
+        <div class="advice-card" id="advice-card">
+          <div class="advice-header">
+            <span class="advice-icon">&#128161;</span>
+            <h3>今日のアドバイス</h3>
+          </div>
+          <div class="advice-greeting" id="advice-greeting"></div>
+          <div class="advice-score-comment" id="advice-score-comment"></div>
+          <div class="advice-list" id="advice-list"></div>
+          <div class="advice-suggestions" id="advice-suggestions" style="display:none;">
+            <h4>おすすめ食品</h4>
+            <div id="food-suggestions"></div>
+          </div>
+          <div class="daily-tip" id="daily-tip"></div>
+        </div>
+
         <div class="card">
-          <div class="card-title">今日の栄養バランス</div>
-          <div class="nutrition-bars">
+          <div class="card-title" data-i18n="dashboard.nutritionBalance">今日の栄養バランス</div>
+          <div class="nutrition-bars" role="group" aria-label="栄養素の摂取状況">
             <div class="nutrition-row">
-              <span class="nutrition-label">タンパク質</span>
-              <div class="nutrition-bar"><div class="nutrition-fill protein" id="bar-protein" style="width:0%"></div></div>
+              <span class="nutrition-label" data-i18n="dashboard.protein">タンパク質</span>
+              <div class="nutrition-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="80"><div class="nutrition-fill protein" id="bar-protein" style="width:0%"></div></div>
               <span class="nutrition-value" id="val-protein">0/80g</span>
             </div>
             <div class="nutrition-row">
-              <span class="nutrition-label">脂質</span>
-              <div class="nutrition-bar"><div class="nutrition-fill fat" id="bar-fat" style="width:0%"></div></div>
+              <span class="nutrition-label" data-i18n="dashboard.fat">脂質</span>
+              <div class="nutrition-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="65"><div class="nutrition-fill fat" id="bar-fat" style="width:0%"></div></div>
               <span class="nutrition-value" id="val-fat">0/65g</span>
             </div>
             <div class="nutrition-row">
-              <span class="nutrition-label">炭水化物</span>
-              <div class="nutrition-bar"><div class="nutrition-fill carb" id="bar-carb" style="width:0%"></div></div>
+              <span class="nutrition-label" data-i18n="dashboard.carbs">炭水化物</span>
+              <div class="nutrition-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="250"><div class="nutrition-fill carb" id="bar-carb" style="width:0%"></div></div>
               <span class="nutrition-value" id="val-carb">0/250g</span>
             </div>
             <div class="nutrition-row">
-              <span class="nutrition-label">食物繊維</span>
-              <div class="nutrition-bar"><div class="nutrition-fill fiber" id="bar-fiber" style="width:0%"></div></div>
+              <span class="nutrition-label" data-i18n="dashboard.fiber">食物繊維</span>
+              <div class="nutrition-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="20"><div class="nutrition-fill fiber" id="bar-fiber" style="width:0%"></div></div>
               <span class="nutrition-value" id="val-fiber">0/20g</span>
             </div>
           </div>
@@ -157,80 +303,332 @@
 
         <div class="card">
           <div class="card-title">体重を記録</div>
-          <form id="weight-form" class="weight-form">
+          <form id="weight-form" class="weight-form" aria-label="体重記録フォーム">
             <div class="weight-inputs">
               <div class="weight-field">
-                <label>体重 (kg)</label>
+                <label for="weight-input">体重 (kg)</label>
                 <input type="number" id="weight-input" step="0.1" min="20" max="300" placeholder="60.0" required>
               </div>
               <div class="weight-field">
-                <label>体脂肪率 (%)</label>
+                <label for="bodyfat-input">体脂肪率 (%)</label>
                 <input type="number" id="bodyfat-input" step="0.1" min="1" max="60" placeholder="20.0">
               </div>
-              <button type="submit" class="btn btn-primary btn-sm">記録</button>
+              <button type="submit" class="btn btn-primary btn-sm" aria-label="体重を記録する">記録</button>
             </div>
           </form>
-          <div id="weight-chart" class="weight-chart-container"></div>
+          <!-- 4.3 体重チャート期間セレクタ -->
+          <div class="weight-period-selector" role="group" aria-label="体重グラフの表示期間">
+            <button class="weight-period-btn active" data-days="7" aria-label="7日間の体重推移を表示">7日</button>
+            <button class="weight-period-btn" data-days="30" aria-label="30日間の体重推移を表示">30日</button>
+            <button class="weight-period-btn" data-days="90" aria-label="90日間の体重推移を表示">90日</button>
+          </div>
+          <div class="weight-chart-container" role="img" aria-label="体重推移グラフ" style="position:relative; height:200px;">
+            <canvas id="weight-chart-canvas"></canvas>
+          </div>
         </div>
+      </div>
+
+      <!-- 運動記録 & 水分摂取 (右カラム続き) -->
+      <div style="display:flex; flex-direction:column; gap:16px; grid-column: 2;">
+        <div class="card exercise-section">
+          <h3 class="card-title">&#127939; 運動記録</h3>
+          <div class="exercise-quick-add">
+            <select id="exercise-select" aria-label="運動を選択">
+              <option value="">運動を選択...</option>
+            </select>
+            <input type="number" id="exercise-duration" placeholder="分" min="1" max="480" aria-label="運動時間（分）">
+            <button class="btn btn-primary btn-sm" onclick="addExercise()">追加</button>
+          </div>
+          <div id="exercise-log" class="exercise-log" role="list" aria-label="運動記録一覧"></div>
+          <div class="exercise-summary">
+            消費カロリー: <span id="exercise-total">0</span> kcal
+          </div>
+        </div>
+
+        <div class="card water-section">
+          <h3 class="card-title">&#128167; 水分摂取</h3>
+          <div class="water-display">
+            <div class="water-progress">
+              <div class="water-fill" id="water-fill"></div>
+              <span class="water-text" id="water-text">0 / 2000 ml</span>
+            </div>
+          </div>
+          <div class="water-buttons">
+            <button onclick="addWater(200)">コップ1杯<br>200ml</button>
+            <button onclick="addWater(350)">ペットボトル小<br>350ml</button>
+            <button onclick="addWater(500)">ペットボトル<br>500ml</button>
+            <button onclick="addWater(150)">お茶碗<br>150ml</button>
+          </div>
+        </div>
+
+        <div class="card sleep-section">
+          <h3 class="card-title">&#128564; 睡眠記録</h3>
+          <div class="sleep-form">
+            <div class="sleep-times">
+              <div class="sleep-input-group">
+                <label for="sleep-bedtime">就寝</label>
+                <input type="time" id="sleep-bedtime" value="23:00">
+              </div>
+              <div class="sleep-input-group">
+                <label for="sleep-wakeup">起床</label>
+                <input type="time" id="sleep-wakeup" value="07:00">
+              </div>
+            </div>
+            <div class="sleep-quality">
+              <label>睡眠の質</label>
+              <div class="quality-stars" id="sleep-quality-stars">
+                <span class="star" onclick="setSleepQuality(1)">&#9733;</span>
+                <span class="star" onclick="setSleepQuality(2)">&#9733;</span>
+                <span class="star" onclick="setSleepQuality(3)">&#9733;</span>
+                <span class="star" onclick="setSleepQuality(4)">&#9733;</span>
+                <span class="star" onclick="setSleepQuality(5)">&#9733;</span>
+              </div>
+            </div>
+            <button onclick="saveSleep()" class="btn btn-primary btn-sm">記録する</button>
+          </div>
+          <div class="sleep-summary" id="sleep-summary">
+            <!-- Shows this week's average sleep -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 食事フォトギャラリー (全幅) -->
+      <div class="card" style="grid-column: 1 / -1;">
+        <div class="card-title">食事フォトギャラリー</div>
+        <div class="gallery-grid" id="photo-gallery"></div>
       </div>
 
       <!-- 食事ログ (全幅) -->
       <div class="card" style="grid-column: 1 / -1;">
-        <div class="card-title">今日の食事</div>
-        <div id="meal-log" class="meal-log"></div>
+        <div class="card-title" data-i18n="dashboard.todaysMeals">今日の食事</div>
+        <div id="meal-log" class="meal-log" role="list" aria-label="今日の食事一覧"></div>
+        <div class="share-section">
+          <button onclick="shareDailyReport()" class="btn btn-secondary" data-i18n="dashboard.shareRecord">今日の記録をシェア</button>
+        </div>
       </div>
     </div>
   </main>
 
-  <!-- 食品追加モーダル -->
-  <div class="modal-overlay" id="add-modal">
+  <!-- 食品追加/編集モーダル -->
+  <div class="modal-overlay" id="add-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 id="modal-food-name">食品名</h3>
-        <button class="modal-close" onclick="closeModal()">×</button>
+        <h3><span id="modal-title-text">食品を追加</span> - <span id="modal-food-name">食品名</span></h3>
+        <button class="modal-close" onclick="closeModal()" aria-label="モーダルを閉じる">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label>量 (g)</label>
+          <label for="modal-weight">量 (g)</label>
           <input type="number" id="modal-weight" value="100" min="1" max="2000" oninput="updateModalPreview()">
           <input type="hidden" id="modal-food-id">
         </div>
-        <div class="modal-preview">
+        <!-- 4.2 食事タイプ選択 (モーダル) -->
+        <div class="form-group">
+          <label for="modal-meal-type">食事タイプ</label>
+          <select id="modal-meal-type" class="meal-type-select">
+            <option value="朝食">朝食</option>
+            <option value="昼食">昼食</option>
+            <option value="間食">間食</option>
+            <option value="夕食">夕食</option>
+          </select>
+        </div>
+        <div class="modal-preview" aria-live="polite">
           <span id="modal-cal">0 kcal</span>
           <span id="modal-protein">P: 0g</span>
           <span id="modal-fat">F: 0g</span>
           <span id="modal-carb">C: 0g</span>
         </div>
-        <div class="weight-quick-btns">
-          <button onclick="document.getElementById('modal-weight').value=50; updateModalPreview()">50g</button>
-          <button onclick="document.getElementById('modal-weight').value=100; updateModalPreview()">100g</button>
-          <button onclick="document.getElementById('modal-weight').value=150; updateModalPreview()">150g</button>
-          <button onclick="document.getElementById('modal-weight').value=200; updateModalPreview()">200g</button>
-          <button onclick="document.getElementById('modal-weight').value=300; updateModalPreview()">300g</button>
+        <div class="weight-quick-btns" role="group" aria-label="量のクイック選択">
+          <button onclick="document.getElementById('modal-weight').value=50; updateModalPreview()" aria-label="50グラムに設定">50g</button>
+          <button onclick="document.getElementById('modal-weight').value=100; updateModalPreview()" aria-label="100グラムに設定">100g</button>
+          <button onclick="document.getElementById('modal-weight').value=150; updateModalPreview()" aria-label="150グラムに設定">150g</button>
+          <button onclick="document.getElementById('modal-weight').value=200; updateModalPreview()" aria-label="200グラムに設定">200g</button>
+          <button onclick="document.getElementById('modal-weight').value=300; updateModalPreview()" aria-label="300グラムに設定">300g</button>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-primary" onclick="addFoodFromModal()">記録する</button>
+        <button class="btn btn-primary" id="modal-submit-btn" onclick="addFoodFromModal()" aria-label="食品を記録する">記録する</button>
       </div>
     </div>
   </div>
 
-  <!-- トースト用 -->
+  <!-- Photo Lightbox -->
+  <div class="lightbox-overlay" id="lightbox" style="display:none" onclick="closeLightbox()">
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+      <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+      <img id="lightbox-img" src="" alt="食事の写真">
+      <div class="lightbox-info">
+        <p id="lightbox-name"></p>
+        <p id="lightbox-date"></p>
+      </div>
+    </div>
+  </div>
 
+  <!-- Badges Modal -->
+  <div class="modal-overlay" id="badges-modal" style="display:none">
+    <div class="modal-content badges-modal-content">
+      <button class="modal-close" aria-label="閉じる" onclick="closeBadgesModal()">&times;</button>
+      <h2>&#127941; 獲得バッジ</h2>
+      <div class="badges-level-summary" id="badges-level-summary"></div>
+      <div class="badges-grid" id="badges-grid"></div>
+      <h3>週間チャレンジ</h3>
+      <div id="challenge-detail"></div>
+    </div>
+  </div>
+
+  <!-- Badge Notification -->
+  <div class="badge-notification" id="badge-notification" style="display:none">
+    <div class="badge-notification-inner">
+      <div class="badge-notification-icon" id="badge-notification-icon"></div>
+      <div class="badge-notification-text">
+        <div class="badge-notification-title" id="badge-notification-title"></div>
+        <div class="badge-notification-desc" id="badge-notification-desc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- カスタム食品登録モーダル -->
+  <div class="modal-overlay" id="custom-food-modal" role="dialog" aria-modal="true" aria-label="カスタム食品登録">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>カスタム食品を登録</h3>
+        <button class="modal-close" onclick="closeCustomFoodModal()" aria-label="閉じる">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="custom-food-name">食品名 *</label>
+          <input type="text" id="custom-food-name" placeholder="例: 自家製カレー" required>
+        </div>
+        <div class="form-group">
+          <label for="custom-food-category">カテゴリ</label>
+          <select id="custom-food-category" class="meal-type-select">
+            <option value="ごはん">ごはん</option>
+            <option value="めん">めん</option>
+            <option value="パン">パン</option>
+            <option value="肉">肉</option>
+            <option value="魚">魚</option>
+            <option value="野菜">野菜</option>
+            <option value="飲料">飲料</option>
+            <option value="コンビニ">コンビニ</option>
+            <option value="ファストフード">ファストフード</option>
+            <option value="デザート">デザート</option>
+            <option value="サラダ">サラダ</option>
+            <option value="卵">卵</option>
+            <option value="汁物">汁物</option>
+            <option value="果物">果物</option>
+            <option value="乳製品">乳製品</option>
+            <option value="その他" selected>その他</option>
+          </select>
+        </div>
+        <p style="font-size:0.78rem;color:var(--text-sub);margin-bottom:8px;">100gあたりの栄養素を入力してください</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div class="form-group">
+            <label for="custom-food-cal">カロリー (kcal)</label>
+            <input type="number" id="custom-food-cal" placeholder="0" min="0">
+          </div>
+          <div class="form-group">
+            <label for="custom-food-protein">タンパク質 (g)</label>
+            <input type="number" id="custom-food-protein" placeholder="0" min="0" step="0.1">
+          </div>
+          <div class="form-group">
+            <label for="custom-food-fat">脂質 (g)</label>
+            <input type="number" id="custom-food-fat" placeholder="0" min="0" step="0.1">
+          </div>
+          <div class="form-group">
+            <label for="custom-food-carb">炭水化物 (g)</label>
+            <input type="number" id="custom-food-carb" placeholder="0" min="0" step="0.1">
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label for="custom-food-fiber">食物繊維 (g)</label>
+            <input type="number" id="custom-food-fiber" placeholder="0" min="0" step="0.1">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="saveCustomFood()">登録する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- シェアモーダル -->
+  <div class="modal-overlay" id="share-modal" style="display:none">
+    <div class="modal-content share-modal-content">
+      <button class="modal-close" aria-label="閉じる" onclick="document.getElementById('share-modal').style.display='none'">&times;</button>
+      <h2>記録をシェア</h2>
+      <textarea id="share-text" rows="8" readonly></textarea>
+      <div class="share-buttons">
+        <button onclick="copyShareText()" class="share-btn copy-btn">コピー</button>
+        <button onclick="shareToTwitter()" class="share-btn twitter-btn">X (Twitter)</button>
+        <button onclick="shareToLine()" class="share-btn line-btn">LINE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- トースト通知コンテナ -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.4/dist/quagga.min.js"></script>
+  <script src="../js/i18n.js"></script>
   <script src="../js/config.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/food-db.js"></script>
+  <script src="../js/barcode-db.js"></script>
+  <script src="../js/exercise-db.js"></script>
   <script src="../js/store.js"></script>
+  <script src="../js/vision-api.js"></script>
+  <script src="../js/gamification.js"></script>
   <script src="../js/main.js"></script>
+  <script src="../js/advisor.js"></script>
+  <script src="../js/notifications.js"></script>
   <script src="../js/dashboard.js"></script>
   <script>
     // タブ切り替え
     function switchTab(name) {
-      document.querySelectorAll('.record-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      event.target.classList.add('active');
-      document.getElementById('tab-' + name).classList.add('active');
+      document.querySelectorAll('.record-tab').forEach(function(t) {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+      var btn = document.getElementById('tab-btn-' + name);
+      if (btn) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+      }
+      var tab = document.getElementById('tab-' + name);
+      if (tab) tab.classList.add('active');
+
+      // Stop barcode scanner when switching away
+      if (name !== 'barcode' && typeof stopBarcodeScanner === 'function') {
+        stopBarcodeScanner();
+      }
     }
+
+    // 健康スコアバッジのホバー/クリックで内訳表示
+    var scoreBadge = document.getElementById('health-score-badge');
+    if (scoreBadge) {
+      scoreBadge.addEventListener('mouseenter', function() {
+        var tooltip = document.getElementById('score-breakdown');
+        if (tooltip && scoreBadge.dataset.breakdown) {
+          tooltip.style.display = 'block';
+        }
+      });
+      scoreBadge.addEventListener('mouseleave', function() {
+        var tooltip = document.getElementById('score-breakdown');
+        if (tooltip) tooltip.style.display = 'none';
+      });
+      scoreBadge.addEventListener('click', function() {
+        var tooltip = document.getElementById('score-breakdown');
+        if (tooltip) {
+          tooltip.style.display = tooltip.style.display === 'none' ? 'block' : 'none';
+        }
+      });
+    }
+  </script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('../sw.js');
+  }
   </script>
 </body>
 </html>

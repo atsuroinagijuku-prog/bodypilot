@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>目標設定 - BodyPilot</title>
+  <meta name="description" content="BodyPilot目標設定 - ダイエットプラン、目標体重、Myルールを設定。">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#7B8B2E">
+  <link rel="icon" type="image/svg+xml" href="../images/icon-192.svg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <script>
+    (function() {
+      var saved = localStorage.getItem('bp_theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    })();
+  </script>
+  <style>
+    /* ===== Goal Page Layout ===== */
+    .goals-container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 20px 16px 80px;
+    }
+
+    .goals-page-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    /* ===== Goal Sub-Tabs ===== */
+    .goal-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .goal-tab {
+      flex: 1;
+      padding: 12px 8px;
+      background: none;
+      border: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-light);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .goal-tab.active {
+      color: var(--green);
+      border-bottom-color: var(--green);
+    }
+
+    .goal-tab:hover {
+      color: var(--green-light);
+    }
+
+    .goal-tab-content {
+      display: none;
+    }
+
+    .goal-tab-content.active {
+      display: block;
+    }
+
+    /* ===== Plan Tab ===== */
+    .plan-section {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 16px 20px;
+      margin-bottom: 14px;
+    }
+
+    .plan-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .plan-section-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .plan-change-btn {
+      background: none;
+      border: 1px solid var(--green);
+      color: var(--green);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 14px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .plan-change-btn:hover {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .plan-value {
+      font-size: 1rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .plan-value-large {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--green);
+    }
+
+    .plan-value-unit {
+      font-size: 0.82rem;
+      color: var(--text-sub);
+      font-weight: 400;
+    }
+
+    .plan-target-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .plan-target-row:last-child {
+      border-bottom: none;
+    }
+
+    .plan-target-icon {
+      font-size: 1.2rem;
+      width: 32px;
+      text-align: center;
+    }
+
+    .plan-target-label {
+      flex: 1;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+
+    .plan-target-value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .plan-not-set {
+      color: var(--text-light);
+      font-style: italic;
+      font-size: 0.85rem;
+    }
+
+    .plan-deadline-info {
+      background: var(--green-bg);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin: 8px 0;
+      font-size: 0.83rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .plan-deadline-info strong {
+      color: var(--green);
+    }
+
+    .plan-weight-summary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 12px 0;
+    }
+
+    .plan-weight-box {
+      text-align: center;
+    }
+
+    .plan-weight-box-label {
+      font-size: 0.72rem;
+      color: var(--text-sub);
+      margin-bottom: 2px;
+    }
+
+    .plan-weight-box-value {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--green);
+    }
+
+    .plan-weight-box-unit {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      font-weight: 400;
+    }
+
+    .plan-weight-arrow {
+      font-size: 1.2rem;
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    /* ===== Step Form (Weight Tab) ===== */
+    .step-section {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .step-section-header {
+      background: var(--green);
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-section-header .step-badge {
+      background: rgba(255,255,255,0.25);
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 2px 10px;
+      border-radius: var(--radius-pill);
+    }
+
+    .step-section-body {
+      padding: 20px;
+    }
+
+    .step-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .step-form-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .step-form-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      min-width: 120px;
+    }
+
+    .step-form-label-full {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .step-form-input {
+      flex: 1;
+      min-width: 100px;
+      max-width: 160px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: var(--input-bg);
+      color: var(--text);
+    }
+
+    .step-form-input:focus {
+      outline: none;
+      border-color: var(--green);
+      box-shadow: 0 0 0 2px rgba(123, 139, 46, 0.15);
+    }
+
+    .step-form-unit {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+
+    .step-link {
+      font-size: 0.78rem;
+      color: var(--green);
+      cursor: pointer;
+      text-decoration: underline;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    .step-link:hover {
+      color: var(--green-light);
+    }
+
+    .step-btn-next {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+
+    .step-btn-next:hover {
+      background: var(--green-light);
+    }
+
+    .step-btn-next:disabled {
+      background: var(--border);
+      cursor: not-allowed;
+    }
+
+    .step-btn-register {
+      padding: 8px 18px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .step-btn-register:hover {
+      background: var(--green-light);
+    }
+
+    /* Activity level display */
+    .activity-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--cream);
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+
+    .activity-display-text {
+      flex: 1;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .activity-options-panel {
+      display: none;
+      background: var(--cream);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 6px;
+    }
+
+    .activity-options-panel.show {
+      display: block;
+    }
+
+    .activity-option-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .activity-option-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-option-item:hover {
+      color: var(--green);
+    }
+
+    .activity-option-item.selected {
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .activity-option-item input[type="radio"] {
+      accent-color: var(--green);
+    }
+
+    /* ===== Step 2 specifics ===== */
+    .step2-summary {
+      background: var(--green-bg);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+    }
+
+    .step2-summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      padding: 3px 0;
+      color: var(--text);
+    }
+
+    .step2-summary-row strong {
+      color: var(--green);
+    }
+
+    .step2-arrow {
+      color: var(--green);
+      font-weight: 700;
+      margin: 0 8px;
+    }
+
+    .step2-weight-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 8px 0;
+    }
+
+    .step2-weight-item {
+      text-align: center;
+    }
+
+    .step2-weight-item-label {
+      font-size: 0.72rem;
+      color: var(--text-sub);
+    }
+
+    .step2-weight-item-value {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--green);
+    }
+
+    .step2-flow-arrow {
+      font-size: 1.2rem;
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .step2-reduction {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text);
+      padding: 4px 0;
+    }
+
+    .step2-reduction strong {
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    .step2-estimate {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-sub);
+      padding: 4px 0 8px;
+    }
+
+    .step2-estimate strong {
+      color: var(--green);
+    }
+
+    /* Section sub-label */
+    .step-section-sublabel {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 16px 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Pace Options */
+    .pace-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .pace-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--cream);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pace-option:hover {
+      border-color: var(--green-light);
+    }
+
+    .pace-option.selected {
+      border-color: var(--green);
+      background: var(--green-bg);
+    }
+
+    .pace-option input[type="radio"] {
+      accent-color: var(--green);
+      width: 18px;
+      height: 18px;
+    }
+
+    .pace-option-info {
+      flex: 1;
+    }
+
+    .pace-option-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .pace-option-desc {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    .pace-option-badge {
+      background: var(--green);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+    }
+
+    .pace-custom-input {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      margin-left: 28px;
+    }
+
+    .pace-custom-input.show {
+      display: flex;
+    }
+
+    .pace-custom-field {
+      width: 80px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      background: var(--input-bg);
+      color: var(--text);
+    }
+
+    .pace-custom-field:focus {
+      outline: none;
+      border-color: var(--green);
+    }
+
+    /* Style Options */
+    .style-options {
+      display: flex;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .style-option {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      background: var(--cream);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .style-option:hover {
+      border-color: var(--green-light);
+    }
+
+    .style-option.selected {
+      border-color: var(--green);
+      background: var(--green-bg);
+    }
+
+    .style-option input[type="radio"] {
+      accent-color: var(--green);
+    }
+
+    .style-option-icon {
+      font-size: 1.5rem;
+    }
+
+    .style-option-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* Goal Summary Cards */
+    .goal-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .goal-summary-card {
+      background: var(--cream);
+      border-radius: var(--radius);
+      padding: 14px;
+      text-align: center;
+    }
+
+    .goal-summary-icon {
+      font-size: 1.5rem;
+      margin-bottom: 4px;
+    }
+
+    .goal-summary-label {
+      font-size: 0.72rem;
+      color: var(--text-sub);
+      font-weight: 600;
+    }
+
+    .goal-summary-value {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--green);
+    }
+
+    .goal-summary-unit {
+      font-size: 0.72rem;
+      color: var(--text-sub);
+    }
+
+    /* ===== Rules Tab ===== */
+    .rules-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .rules-header h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .rules-header p {
+      font-size: 0.82rem;
+      color: var(--text-sub);
+      line-height: 1.5;
+    }
+
+    .rules-mascot {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .mascot-bubble {
+      background: var(--green-bg);
+      border: 2px solid var(--green-pale);
+      border-radius: 16px;
+      padding: 16px 20px;
+      position: relative;
+      max-width: 360px;
+      width: 100%;
+    }
+
+    .mascot-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 10px solid var(--green-pale);
+    }
+
+    .mascot-bubble-text {
+      font-size: 0.82rem;
+      color: var(--text);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+
+    .mascot-icon {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-top: 8px;
+      margin-bottom: 12px;
+    }
+
+    .suggested-rules {
+      list-style: none;
+      padding: 0;
+    }
+
+    .suggested-rules li {
+      font-size: 0.82rem;
+      color: var(--text);
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .suggested-rules li::before {
+      content: '\2713';
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .rules-daily-hint {
+      background: var(--cream);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      font-size: 0.78rem;
+      color: var(--text-sub);
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .rules-input-section {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+    }
+
+    .rules-input-hint {
+      font-size: 0.78rem;
+      color: var(--text-sub);
+      margin-bottom: 10px;
+    }
+
+    .rule-input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .rule-input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background: var(--input-bg);
+      color: var(--text);
+    }
+
+    .rule-input:focus {
+      outline: none;
+      border-color: var(--green);
+      box-shadow: 0 0 0 2px rgba(123, 139, 46, 0.15);
+    }
+
+    .rule-input-btn {
+      padding: 10px 20px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+
+    .rule-input-btn:hover {
+      background: var(--green-light);
+    }
+
+    .rule-char-count {
+      text-align: right;
+      font-size: 0.7rem;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+
+    .rule-char-count.over {
+      color: #e74c3c;
+    }
+
+    /* Rule List */
+    .rules-list-section {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 16px 20px;
+    }
+
+    .rules-list-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rule-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .rule-item:last-child {
+      border-bottom: none;
+    }
+
+    .rule-text {
+      flex: 1;
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+
+    .rule-check-btns {
+      display: flex;
+      gap: 4px;
+    }
+
+    .rule-check-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--cream);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .rule-check-btn.ok {
+      color: var(--green);
+    }
+
+    .rule-check-btn.ok.active {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+
+    .rule-check-btn.ng {
+      color: #e74c3c;
+    }
+
+    .rule-check-btn.ng.active {
+      background: #e74c3c;
+      border-color: #e74c3c;
+      color: #fff;
+    }
+
+    .rule-delete-btn {
+      background: none;
+      border: none;
+      color: var(--text-light);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+
+    .rule-delete-btn:hover {
+      color: #e74c3c;
+    }
+
+    .rules-empty {
+      text-align: center;
+      color: var(--text-light);
+      font-size: 0.85rem;
+      padding: 20px 0;
+      font-style: italic;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 600px) {
+      .goals-container {
+        padding: 12px 10px 80px;
+      }
+
+      .goal-tab {
+        font-size: 0.8rem;
+        padding: 10px 4px;
+      }
+
+      .step-form-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+      }
+
+      .step-form-label {
+        min-width: unset;
+      }
+
+      .step-form-input {
+        max-width: 100%;
+      }
+
+      .style-options {
+        flex-direction: column;
+      }
+
+      .style-option {
+        flex-direction: row;
+        text-align: left;
+        padding: 10px 14px;
+      }
+
+      .goal-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .rule-input-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">メインコンテンツにスキップ</a>
+  <!-- ヘッダー -->
+  <header class="app-header">
+    <a href="../index.html" class="app-logo">🍏 BodyPilot</a>
+    <div class="app-user-area">
+      <span id="user-name"></span>
+      <a href="settings.html" class="header-link">⚙️</a>
+      <button onclick="handleLogout()" class="logout-btn">ログアウト</button>
+    </div>
+  </header>
+
+  <!-- アプリ内ナビ -->
+  <nav class="app-nav">
+    <a href="meal.html" class="app-nav-item">食事記録</a>
+    <a href="diary.html" class="app-nav-item">日記</a>
+    <a href="graph.html" class="app-nav-item">グラフ</a>
+    <a href="goals.html" class="app-nav-item active">目標設定</a>
+    <a href="calculator.html" class="app-nav-item">簡単カロリー計算</a>
+  </nav>
+
+  <main class="dashboard" role="main" id="main-content">
+    <div class="goals-container">
+      <div class="skip-setup">
+        <a href="meal.html">あとで設定する →</a>
+      </div>
+      <h2 class="goals-page-title">目標設定</h2>
+
+      <!-- Sub-tabs -->
+      <div class="goal-tabs">
+        <button class="goal-tab active" id="tab-btn-plan" onclick="switchGoalTab('plan')">Myプラン</button>
+        <button class="goal-tab" id="tab-btn-weight" onclick="switchGoalTab('weight')">目標体重</button>
+        <button class="goal-tab" id="tab-btn-rules" onclick="switchGoalTab('rules')">Myルール</button>
+      </div>
+
+      <!-- ===== Tab 1: Myプラン ===== -->
+      <div class="goal-tab-content active" id="tab-plan">
+        <!-- 現在のプランサマリー -->
+        <div class="plan-section">
+          <div class="plan-section-header">
+            <span class="plan-section-title">現在のプラン</span>
+            <button class="plan-change-btn" onclick="switchGoalTab('weight')">編集する</button>
+          </div>
+          <div id="plan-weight-summary">
+            <span class="plan-not-set">目標が設定されていません</span>
+          </div>
+        </div>
+
+        <!-- 目標カロリー -->
+        <div class="plan-section">
+          <div class="plan-section-header">
+            <span class="plan-section-title">1日の目標カロリー</span>
+          </div>
+          <div id="plan-calorie-details">
+            <div class="plan-target-row">
+              <span class="plan-target-icon">&#127858;</span>
+              <span class="plan-target-label">摂取カロリー</span>
+              <span class="plan-target-value" id="plan-target-intake">--- kcal</span>
+            </div>
+            <div class="plan-target-row">
+              <span class="plan-target-icon">&#127939;</span>
+              <span class="plan-target-label">消費カロリー</span>
+              <span class="plan-target-value" id="plan-target-burn">--- kcal</span>
+            </div>
+            <div class="plan-target-row">
+              <span class="plan-target-icon">&#128694;</span>
+              <span class="plan-target-label">目標歩数</span>
+              <span class="plan-target-value" id="plan-target-steps">--- 歩</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Myルール (サマリー) -->
+        <div class="plan-section">
+          <div class="plan-section-header">
+            <span class="plan-section-title">Myルール</span>
+            <button class="plan-change-btn" onclick="switchGoalTab('rules')">設定する</button>
+          </div>
+          <div id="plan-rules-summary">
+            <span class="plan-not-set">設定されていません</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Tab 2: 目標体重 ===== -->
+      <div class="goal-tab-content" id="tab-weight">
+        <!-- STEP 1 -->
+        <div class="step-section" id="weight-step1">
+          <div class="step-section-header">
+            <span class="step-badge">STEP1</span> 目標確認
+          </div>
+          <div class="step-section-body">
+            <div class="step-form">
+              <!-- 現在の体重 -->
+              <div class="step-form-label-full">現在の体重を入力してください。</div>
+              <div class="step-form-row">
+                <input type="number" id="current-weight" class="step-form-input" step="0.1" min="20" max="300" placeholder="60.0">
+                <span class="step-form-unit">kg</span>
+                <button class="step-btn-register" onclick="registerCurrentWeight()">登録する</button>
+              </div>
+
+              <!-- 身体活動レベル -->
+              <div style="margin-top:10px;">
+                <div class="step-form-label-full">身体活動レベル</div>
+                <div class="activity-display" id="activity-display">
+                  <span class="activity-display-text" id="activity-display-text">あまり動かない</span>
+                  <button class="plan-change-btn" onclick="toggleActivityOptions()">変更する</button>
+                </div>
+                <div class="activity-options-panel" id="activity-options-panel">
+                  <label class="activity-option-item selected" onclick="selectActivity(this, 'sedentary')">
+                    <input type="radio" name="activity" value="sedentary" checked> あまり動かない
+                  </label>
+                  <label class="activity-option-item" onclick="selectActivity(this, 'moderate')">
+                    <input type="radio" name="activity" value="moderate"> やや活動的
+                  </label>
+                  <label class="activity-option-item" onclick="selectActivity(this, 'active')">
+                    <input type="radio" name="activity" value="active"> 活動的
+                  </label>
+                </div>
+              </div>
+
+              <!-- 目標体重 -->
+              <div style="margin-top:10px;">
+                <div class="step-form-label-full">目標体重を設定してください。</div>
+                <div class="step-form-row">
+                  <input type="number" id="goal-weight" class="step-form-input" step="0.1" min="20" max="300" placeholder="55.0">
+                  <span class="step-form-unit">kg</span>
+                </div>
+                <div style="margin-top:6px;">
+                  <button class="step-link" onclick="setMaintainWeight()">※現在の体重を維持したい方はこちら</button>
+                </div>
+              </div>
+
+              <button class="step-btn-next" onclick="goToStep2()">次に進む</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2 (hidden by default) -->
+        <div class="step-section" id="weight-step2" style="display:none;">
+          <div class="step-section-header">
+            <span class="step-badge">STEP2</span> がんばる度合い・がんばり方選択
+          </div>
+          <div class="step-section-body">
+            <!-- Weight summary flow -->
+            <div class="step2-summary" id="step2-summary">
+              <!-- Filled by JS -->
+            </div>
+
+            <div class="step-form">
+              <!-- Pace selection -->
+              <div class="step-section-sublabel">どのくらいのペースでがんばりますか？</div>
+              <div class="pace-options" id="pace-options">
+                <label class="pace-option" onclick="selectPace(this, '1.0')">
+                  <input type="radio" name="pace" value="1.0">
+                  <div class="pace-option-info">
+                    <div class="pace-option-title">ゆっくりペース</div>
+                    <div class="pace-option-desc">月に1.0kg</div>
+                  </div>
+                </label>
+                <label class="pace-option selected" onclick="selectPace(this, '2.0')">
+                  <input type="radio" name="pace" value="2.0" checked>
+                  <div class="pace-option-info">
+                    <div class="pace-option-title">ちょうどいいペース</div>
+                    <div class="pace-option-desc">月に2.0kg</div>
+                  </div>
+                  <span class="pace-option-badge">おすすめ</span>
+                </label>
+                <label class="pace-option" onclick="selectPace(this, 'custom')">
+                  <input type="radio" name="pace" value="custom">
+                  <div class="pace-option-info">
+                    <div class="pace-option-title">自分で入力</div>
+                  </div>
+                </label>
+              </div>
+              <div class="pace-custom-input" id="pace-custom-input">
+                <span class="step-form-unit">月に</span>
+                <input type="number" class="pace-custom-field" id="pace-custom-value" step="0.1" min="0.1" max="5.0" placeholder="1.5" oninput="updateStep2Calculations()">
+                <span class="step-form-unit">kg</span>
+              </div>
+
+              <!-- Style selection -->
+              <div class="step-section-sublabel">どのようにがんばりますか？</div>
+              <div class="style-options" id="style-options">
+                <label class="style-option" onclick="selectStyle(this, 'food')">
+                  <input type="radio" name="style" value="food">
+                  <span class="style-option-icon">&#127858;</span>
+                  <span class="style-option-title">食事中心</span>
+                </label>
+                <label class="style-option selected" onclick="selectStyle(this, 'balance')">
+                  <input type="radio" name="style" value="balance" checked>
+                  <span class="style-option-icon">&#9878;</span>
+                  <span class="style-option-title">バランスよく</span>
+                </label>
+                <label class="style-option" onclick="selectStyle(this, 'exercise')">
+                  <input type="radio" name="style" value="exercise">
+                  <span class="style-option-icon">&#127939;</span>
+                  <span class="style-option-title">運動中心</span>
+                </label>
+              </div>
+
+              <!-- Calculated summary -->
+              <div class="goal-summary" id="goal-calc-summary">
+                <div class="goal-summary-card">
+                  <div class="goal-summary-icon">&#127858;</div>
+                  <div class="goal-summary-label">摂取カロリー</div>
+                  <div class="goal-summary-value" id="calc-target-intake">---</div>
+                  <div class="goal-summary-unit">kcal</div>
+                </div>
+                <div class="goal-summary-card">
+                  <div class="goal-summary-icon">&#127939;</div>
+                  <div class="goal-summary-label">消費カロリー</div>
+                  <div class="goal-summary-value" id="calc-target-burn">---</div>
+                  <div class="goal-summary-unit">kcal / <span id="calc-target-steps">---</span> 歩</div>
+                </div>
+              </div>
+
+              <button class="step-btn-next" onclick="completeGoalSetting()">目標設定を完了する</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Tab 3: Myルール ===== -->
+      <div class="goal-tab-content" id="tab-rules">
+        <div class="rules-mascot">
+          <div class="mascot-bubble">
+            <div class="mascot-bubble-text">目標達成に向けて「これだけは守る」という「Myルール」を決めてみましょう。私からもいくつかご提案させていただきます。</div>
+            <ul class="suggested-rules">
+              <li>どんなに忙しくても記録をつける</li>
+              <li>お菓子を一日1品まで</li>
+              <li>1日10000歩あるく</li>
+              <li>腹八分目でストップする</li>
+            </ul>
+          </div>
+        </div>
+        <div class="mascot-icon">&#128170;</div>
+
+        <div class="rules-daily-hint">毎日、マイページで「&#9675;できた」「&#10005;できなかった」チェックができます。「できた」を押せる日が多くなるように無理のないルールにするとよいですね。</div>
+
+        <div class="rules-input-section">
+          <div class="rules-input-hint">上記を参考に「Myルール」を決めてください。※20個まで</div>
+          <div class="rule-input-row">
+            <input type="text" id="rule-input" class="rule-input" placeholder="Myルールを入力..." maxlength="50">
+            <button class="rule-input-btn" onclick="addRule()">登録する</button>
+          </div>
+          <div class="rule-char-count" id="rule-char-count">0 / 50</div>
+        </div>
+
+        <div class="rules-list-section">
+          <div class="rules-list-title">&#128221; 実施中のMyルール</div>
+          <div id="rules-list">
+            <div class="rules-empty">実施中のMyルールはありません</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- トースト通知コンテナ -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/store.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/goals.js"></script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('../sw.js');
+  }
+  </script>
+</body>
+</html>

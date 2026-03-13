@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>グラフ - BodyPilot</title>
+  <meta name="description" content="BodyPilotグラフ - 健康度・体重・カロリーの推移をグラフで確認。">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#7B8B2E">
+  <link rel="icon" type="image/svg+xml" href="../images/icon-192.svg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <script>
+    (function() {
+      var saved = localStorage.getItem('bp_theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    })();
+  </script>
+  <style>
+    /* Graph Page Layout */
+    .graph-page-layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Page Title */
+    .graph-page-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    /* Graph Tabs - あすけん style horizontal tabs */
+    .graph-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 20px;
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 3px;
+      overflow-x: auto;
+    }
+
+    .graph-tab {
+      flex: 1;
+      padding: 10px 16px;
+      background: none;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-light);
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .graph-tab:hover {
+      color: var(--green);
+      background: rgba(123, 139, 46, 0.08);
+    }
+
+    .graph-tab.active {
+      color: #fff;
+      background: var(--green);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+
+    /* Graph Header with period selector */
+    .graph-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .graph-header h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .period-select {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--text-sub);
+    }
+
+    .period-select label {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 0.8rem;
+    }
+
+    .period-select select {
+      padding: 6px 28px 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.82rem;
+      background: var(--white);
+      color: var(--text);
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    .period-select select:focus {
+      outline: none;
+      border-color: var(--green);
+    }
+
+    .period-data-count {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-left: 4px;
+    }
+
+    /* Chart Container */
+    .graph-canvas-wrapper {
+      position: relative;
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px 16px 16px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      min-height: 380px;
+    }
+
+    .graph-canvas-wrapper canvas {
+      width: 100% !important;
+    }
+
+    /* Y-axis label */
+    .graph-y-label {
+      position: absolute;
+      top: 8px;
+      left: 16px;
+      font-size: 0.7rem;
+      color: var(--text-light);
+      font-weight: 600;
+    }
+
+    .graph-y-label-right {
+      position: absolute;
+      top: 8px;
+      right: 16px;
+      font-size: 0.7rem;
+      color: var(--text-light);
+      font-weight: 600;
+    }
+
+    .graph-x-label {
+      text-align: right;
+      font-size: 0.7rem;
+      color: var(--text-light);
+      margin-top: 2px;
+      padding-right: 4px;
+    }
+
+    /* No Data Message */
+    .graph-no-data {
+      display: none;
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-light);
+      font-size: 0.95rem;
+    }
+
+    .graph-no-data .no-data-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+    /* Legend */
+    .graph-legend {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      padding: 8px 0;
+    }
+
+    .graph-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legend-line {
+      width: 24px;
+      height: 3px;
+      border-radius: 2px;
+    }
+
+    .legend-line.dashed {
+      border-top: 2px dashed;
+      height: 0;
+      background: none;
+    }
+
+    .legend-swatch {
+      width: 16px;
+      height: 12px;
+      border-radius: 2px;
+      opacity: 0.5;
+    }
+
+    /* Week period labels */
+    .graph-week-labels {
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.7rem;
+      color: var(--text-light);
+      margin-top: 4px;
+      padding: 0 40px;
+    }
+
+    /* Right Sidebar Calendar Table */
+    .graph-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .monthly-table-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .monthly-table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      background: var(--green);
+      color: #fff;
+    }
+
+    .monthly-table-header h3 {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 0;
+    }
+
+    .monthly-table-nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .month-nav-btn {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 4px;
+      padding: 2px 10px;
+      font-size: 0.75rem;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .month-nav-btn:hover {
+      background: rgba(255,255,255,0.35);
+    }
+
+    .monthly-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.72rem;
+    }
+
+    .monthly-table th {
+      background: var(--green);
+      color: #fff;
+      padding: 7px 4px;
+      font-weight: 600;
+      text-align: center;
+      font-size: 0.7rem;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .monthly-table td {
+      padding: 6px 4px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-sub);
+      font-size: 0.72rem;
+    }
+
+    .monthly-table tr:hover td {
+      background: var(--green-bg);
+    }
+
+    .monthly-table .date-cell {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .monthly-table .date-link {
+      color: var(--green);
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .monthly-table .date-link:hover {
+      text-decoration: underline;
+    }
+
+    .monthly-table .diary-link {
+      color: var(--green);
+      font-size: 0.68rem;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .monthly-table .diary-link:hover {
+      text-decoration: underline;
+    }
+
+    .monthly-table .diary-new {
+      color: var(--text-light);
+      font-size: 0.65rem;
+    }
+
+    .monthly-table .today-row td {
+      background: var(--green-bg);
+      font-weight: 700;
+    }
+
+    .monthly-table .score-good { color: #4CAF50; font-weight: 700; }
+    .monthly-table .score-warn { color: #FF9800; font-weight: 700; }
+    .monthly-table .score-bad { color: #F44336; font-weight: 700; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .graph-page-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .graph-sidebar {
+        order: 2;
+      }
+
+      .graph-tab {
+        padding: 8px 12px;
+        font-size: 0.78rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .graph-tabs {
+        gap: 0;
+      }
+
+      .graph-tab {
+        padding: 7px 8px;
+        font-size: 0.72rem;
+      }
+
+      .graph-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">メインコンテンツにスキップ</a>
+  <!-- ヘッダー -->
+  <header class="app-header">
+    <a href="../index.html" class="app-logo">🍏 BodyPilot</a>
+    <div class="app-user-area">
+      <span id="user-name-header"></span>
+      <a href="settings.html" class="header-link">⚙️</a>
+      <button onclick="handleLogout()" class="logout-btn">ログアウト</button>
+    </div>
+  </header>
+
+  <!-- アプリ内ナビ -->
+  <nav class="app-nav">
+    <a href="meal.html" class="app-nav-item">食事記録</a>
+    <a href="diary.html" class="app-nav-item">日記</a>
+    <a href="graph.html" class="app-nav-item active">グラフ</a>
+    <a href="goals.html" class="app-nav-item">目標設定</a>
+    <a href="calculator.html" class="app-nav-item">簡単カロリー計算</a>
+  </nav>
+
+  <main class="dashboard" role="main" id="main-content">
+    <div class="dashboard-header">
+      <div>
+        <h2 class="graph-page-title"><span id="user-name-title"></span>さんの健康グラフ</h2>
+      </div>
+    </div>
+
+    <!-- Sub Tabs (あすけん style) -->
+    <div class="graph-tabs">
+      <button class="graph-tab active" onclick="switchGraphTab('health', this)">健康度</button>
+      <button class="graph-tab" onclick="switchGraphTab('weight', this)">体重・体脂肪率</button>
+      <button class="graph-tab" onclick="switchGraphTab('intake', this)">摂取カロリー</button>
+      <button class="graph-tab" onclick="switchGraphTab('burn', this)">消費カロリー</button>
+    </div>
+
+    <div class="graph-page-layout">
+      <!-- Main Chart Area -->
+      <div>
+        <div class="graph-header">
+          <h3 id="graph-title">あすけん健康度</h3>
+          <div class="period-select">
+            <label>表示期間</label>
+            <select id="graph-period" onchange="updateGraph()">
+              <option value="30" selected>1ヶ月</option>
+              <option value="90">3ヶ月</option>
+              <option value="180">6ヶ月</option>
+              <option value="365">1年</option>
+            </select>
+            <span class="period-data-count" id="period-data-count"></span>
+          </div>
+        </div>
+
+        <div class="graph-canvas-wrapper">
+          <span class="graph-y-label" id="graph-y-label">健康度[点]</span>
+          <span class="graph-y-label-right" id="graph-y-label-right" style="display:none;"></span>
+          <canvas id="graph-canvas" height="360"></canvas>
+          <div class="graph-x-label" id="graph-x-label">[日]</div>
+          <div class="graph-no-data" id="graph-no-data">
+            <div class="no-data-icon">&#128200;</div>
+            <p>データがありません。</p>
+            <p style="font-size:0.8rem; margin-top:6px;">食事や体重を記録するとグラフが表示されます</p>
+          </div>
+        </div>
+
+        <!-- Week labels for weight chart -->
+        <div class="graph-week-labels" id="graph-week-labels" style="display:none;"></div>
+
+        <!-- Legend (dynamic) -->
+        <div class="graph-legend" id="graph-legend"></div>
+
+        <!-- Chart accessibility summary -->
+        <p id="chart-summary" class="chart-summary" role="status" aria-live="polite"></p>
+      </div>
+
+      <!-- Right Sidebar - Monthly Record Table -->
+      <div class="graph-sidebar">
+        <div class="monthly-table-card">
+          <div class="monthly-table-header">
+            <button class="month-nav-btn" onclick="changeCalendarMonth(-1)">&larr;</button>
+            <h3 id="calendar-month-title"></h3>
+            <button class="month-nav-btn" onclick="changeCalendarMonth(1)">&rarr;</button>
+          </div>
+          <table class="monthly-table">
+            <thead>
+              <tr>
+                <th>日付</th>
+                <th>体重</th>
+                <th>健康度</th>
+                <th>ダイアリー</th>
+              </tr>
+            </thead>
+            <tbody id="monthly-table-body">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- トースト通知コンテナ -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/store.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/graph.js"></script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('../sw.js');
+  }
+  </script>
+</body>
+</html>

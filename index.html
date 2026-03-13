@@ -4,31 +4,84 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BodyPilot - スマホで撮るだけ食事管理</title>
+  <meta name="description" content="BodyPilot - 写真を撮るだけでカロリー・栄養素を自動計算。無料の健康管理アプリで食事記録、体重管理、栄養バランスチェック。">
+  <link rel="canonical" href="https://bodypilot.app/">
+
+  <!-- OGP -->
+  <meta property="og:title" content="BodyPilot - スマホで撮るだけ食事管理">
+  <meta property="og:description" content="写真を撮るだけでカロリー・栄養素を自動計算。無料の健康管理アプリで食事記録、体重管理、栄養バランスチェック。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bodypilot.app/">
+  <meta property="og:image" content="https://bodypilot.app/images/icon-512.svg">
+  <meta property="og:site_name" content="BodyPilot">
+  <meta property="og:locale" content="ja_JP">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="BodyPilot - スマホで撮るだけ食事管理">
+  <meta name="twitter:description" content="写真を撮るだけでカロリー・栄養素を自動計算。無料の健康管理アプリ。">
+  <meta name="twitter:image" content="https://bodypilot.app/images/icon-512.svg">
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#7B8B2E">
+  <link rel="icon" type="image/svg+xml" href="images/icon-192.svg">
+  <link rel="apple-touch-icon" href="images/icon-192.svg">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "BodyPilot",
+    "description": "写真を撮るだけでカロリー・栄養素を自動計算する健康管理アプリ",
+    "url": "https://bodypilot.app/",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "JPY"
+    },
+    "inLanguage": "ja"
+  }
+  </script>
+
   <link rel="stylesheet" href="css/style.css">
+  <script>
+    // Theme initialization (runs before paint to prevent flash)
+    (function() {
+      var saved = localStorage.getItem('bp_theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    })();
+  </script>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">メインコンテンツにスキップ</a>
   <!-- ヘッダー -->
   <header class="header">
     <div class="header-inner">
-      <a href="/" class="logo">
+      <a href="/" class="logo" aria-label="BodyPilot トップページ">
         <span class="logo-icon">B</span>
         Body<span class="logo-accent">Pilot</span>
       </a>
-      <nav class="nav">
+      <nav class="nav" role="navigation" aria-label="メインナビゲーション">
         <a href="#about">BodyPilotとは</a>
         <a href="#features">機能紹介</a>
         <a href="#tips">健康コラム</a>
         <a href="pages/register.html">新規会員登録(無料)</a>
         <a href="pages/login.html">ログイン</a>
       </nav>
-      <button class="hamburger" id="hamburger">
+      <button class="hamburger" id="hamburger" aria-label="メニューを開く" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
     </div>
   </header>
 
   <!-- ===== ヒーロー ===== -->
-  <section class="hero">
+  <section class="hero" role="main" id="main-content">
     <div class="hero-logo-large">
       <div class="logo">
         <span class="logo-icon">B</span>
@@ -40,8 +93,8 @@
 
     <div class="hero-visual">
       <div class="hero-phone-wrapper">
-        <div class="speech-bubble left">いい調子ですね</div>
-        <div class="hero-phone">
+        <div class="speech-bubble left" aria-hidden="true">いい調子ですね</div>
+        <div class="hero-phone" aria-hidden="true">
           <div class="phone-screen">
             <div class="screen-header">栄養素グラフ</div>
             <div class="screen-body">
@@ -76,7 +129,7 @@
             </div>
           </div>
         </div>
-        <div class="no1-badge">
+        <div class="no1-badge" aria-hidden="true">
           <span class="no1-small">ダウンロード数</span>
           <span class="no1-big">No.1</span>
         </div>
@@ -85,7 +138,7 @@
 
     <div class="hero-cta-area">
       <p class="hero-cta-text">いますぐ<span class="free">無料</span>で始められます！</p>
-      <a href="pages/register.html" class="btn btn-primary btn-lg">無料で始める</a>
+      <a href="pages/register.html" class="btn btn-primary btn-lg" aria-label="無料で始める - 新規登録ページへ">無料で始める</a>
     </div>
   </section>
 
@@ -101,7 +154,7 @@
       <div class="weight-highlight">
         3ヶ月平均 <span class="num">4.66</span><span class="unit">kg減</span>
       </div>
-      <div class="weight-graph">
+      <div class="weight-graph" role="img" aria-label="体重推移グラフ: 0ヶ月から3ヶ月で平均4.66kg減少">
         <div class="graph-bar-group">
           <div class="graph-bar" style="height:30px; background:var(--green-pale);"></div>
           <span class="graph-label">0ヶ月</span>
@@ -134,23 +187,23 @@
       <div class="about-item">
         <div class="about-number">1</div>
         <div class="about-circle">
-          <div class="about-circle-icon">📸</div>
+          <div class="about-circle-icon" aria-hidden="true">📸</div>
           <div class="about-circle-text">食事を記録</div>
         </div>
       </div>
-      <div class="about-arrow">↓</div>
+      <div class="about-arrow" aria-hidden="true">↓</div>
       <div class="about-item reverse">
         <div class="about-number">2</div>
         <div class="about-circle" style="background:#9AB030;">
-          <div class="about-circle-icon">📊</div>
+          <div class="about-circle-icon" aria-hidden="true">📊</div>
           <div class="about-circle-text">AIが栄養を<br>分析</div>
         </div>
       </div>
-      <div class="about-arrow">↓</div>
+      <div class="about-arrow" aria-hidden="true">↓</div>
       <div class="about-item">
         <div class="about-number">3</div>
         <div class="about-circle" style="background:#7B8B2E;">
-          <div class="about-circle-icon">💪</div>
+          <div class="about-circle-icon" aria-hidden="true">💪</div>
           <div class="about-circle-text">健康的な<br>食生活へ</div>
         </div>
       </div>
@@ -167,7 +220,7 @@
           <h3>食後たった1分で完了！<br>簡単だから記録が続く</h3>
           <p>スマホで食べ物を撮影するだけで、AIが食品の種類と大きさ・重さを自動で推定。食べたものを選ぶだけで、簡単にカロリー計算や栄養バランスを確認できます。すばやく食事記録できるための機能が充実しています。</p>
         </div>
-        <div class="point-visual">
+        <div class="point-visual" aria-hidden="true">
           <div class="point-phone">
             <div class="phone-screen">
               <div class="screen-camera-area">
@@ -196,7 +249,7 @@
           <h3>わかりやすい<br>栄養バランスのアドバイス</h3>
           <p>食事を記録すると、カロリーと各種栄養素14項目の過不足がわかる栄養素グラフが、毎日無料でチェックできます。栄養バランスが整った食習慣が身につき、リバウンドしにくい健康的な食生活やダイエットが続けられます。</p>
         </div>
-        <div class="point-visual">
+        <div class="point-visual" aria-hidden="true">
           <div class="point-phone">
             <div class="phone-screen">
               <div class="screen-header">栄養アドバイス</div>
@@ -235,7 +288,7 @@
           <h3>体重や運動の記録も<br>まとめて管理</h3>
           <p>体脂肪率や歩数、運動による消費カロリーなど、様々な情報を1つのアプリでまとめて管理できます。体重の推移グラフで日々の変化が一目でわかります。</p>
         </div>
-        <div class="point-visual">
+        <div class="point-visual" aria-hidden="true">
           <div class="point-phone">
             <div class="phone-screen">
               <div class="screen-header">体重グラフ</div>
@@ -287,7 +340,7 @@
         <div class="step-num">1</div>
         <h3>会員登録</h3>
         <p>簡単1分で完了</p>
-        <div class="step-phone-small">
+        <div class="step-phone-small" aria-hidden="true">
           <div class="phone-screen">
             <div class="step-screen-icon">👋</div>
             <div class="step-screen-text">ようこそ、<br>BodyPilotへ</div>
@@ -295,12 +348,12 @@
           </div>
         </div>
       </div>
-      <div class="step-arrow">→</div>
+      <div class="step-arrow" aria-hidden="true">→</div>
       <div class="step-card fade-in">
         <div class="step-num">2</div>
         <h3>なりたい姿を入力</h3>
         <p>スキップしてもOK！</p>
-        <div class="step-phone-small">
+        <div class="step-phone-small" aria-hidden="true">
           <div class="phone-screen">
             <div class="step-screen-icon">🎯</div>
             <div class="step-screen-text">あなたに合った<br>プランを設定</div>
@@ -308,12 +361,12 @@
           </div>
         </div>
       </div>
-      <div class="step-arrow">→</div>
+      <div class="step-arrow" aria-hidden="true">→</div>
       <div class="step-card fade-in">
         <div class="step-num">3</div>
         <h3>食事内容の入力</h3>
         <p>食事を選ぶだけでOK！</p>
-        <div class="step-phone-small">
+        <div class="step-phone-small" aria-hidden="true">
           <div class="phone-screen">
             <div class="step-screen-icon">📷</div>
             <div class="step-screen-text">写真を撮って<br>自動分析</div>
@@ -328,7 +381,7 @@
   <section class="nutritionist-cta">
     <div class="nutritionist-card fade-in">
       <h3>AIによる栄養分析の<br>アドバイスがもらえる！</h3>
-      <a href="pages/register.html" class="btn btn-primary">無料で始める</a>
+      <a href="pages/register.html" class="btn btn-primary" aria-label="無料で始める - 新規登録ページへ">無料で始める</a>
     </div>
   </section>
 
@@ -342,7 +395,7 @@
     <div class="testimonials-grid">
       <div class="testimonial-card fade-in">
         <div class="testimonial-header">
-          <div class="testimonial-avatar">👩</div>
+          <div class="testimonial-avatar" aria-hidden="true">👩</div>
           <div class="testimonial-meta">
             <div class="name">30代在宅ワーカー 女性</div>
             <div class="result">-12kg達成</div>
@@ -352,7 +405,7 @@
       </div>
       <div class="testimonial-card fade-in">
         <div class="testimonial-header">
-          <div class="testimonial-avatar">👫</div>
+          <div class="testimonial-avatar" aria-hidden="true">👫</div>
           <div class="testimonial-meta">
             <div class="name">夫婦で利用</div>
             <div class="result">2人で合計27kg減</div>
@@ -362,7 +415,7 @@
       </div>
       <div class="testimonial-card fade-in">
         <div class="testimonial-header">
-          <div class="testimonial-avatar">👩</div>
+          <div class="testimonial-avatar" aria-hidden="true">👩</div>
           <div class="testimonial-meta">
             <div class="name">30代女性</div>
             <div class="result">-21kg 自己肯定感UP</div>
@@ -372,7 +425,7 @@
       </div>
       <div class="testimonial-card fade-in">
         <div class="testimonial-header">
-          <div class="testimonial-avatar">👨</div>
+          <div class="testimonial-avatar" aria-hidden="true">👨</div>
           <div class="testimonial-meta">
             <div class="name">50代男性</div>
             <div class="result">健康診断オールA</div>
@@ -382,7 +435,7 @@
       </div>
     </div>
     <div class="testimonials-cta">
-      <a href="#" class="btn btn-primary">体験談をもっと見る</a>
+      <a href="#" class="btn btn-primary" aria-label="体験談をもっと見る">体験談をもっと見る</a>
     </div>
   </section>
 
@@ -391,44 +444,44 @@
     <div class="section-label-dots"></div>
     <div class="section-label">あなたの疑問を解消します</div>
     <div class="section-title">よくあるご質問</div>
-    <div class="faq-list">
-      <div class="faq-item">
-        <div class="faq-question">
+    <div class="faq-list" role="list">
+      <div class="faq-item" role="listitem">
+        <div class="faq-question" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-answer-1">
           <span class="q-icon">Q</span>
           <span class="q-text">無料で利用できますか？</span>
-          <span class="faq-toggle">+</span>
+          <span class="faq-toggle" aria-hidden="true">+</span>
         </div>
-        <div class="faq-answer">
+        <div class="faq-answer" id="faq-answer-1" role="region">
           <div class="faq-answer-inner">はい、基本機能はすべて無料でご利用いただけます。食事の撮影・分析・記録・栄養バランスのグラフ表示は無料プランに含まれています。より詳細なアドバイスやカスタムプランはプレミアムプランでご利用いただけます。</div>
         </div>
       </div>
-      <div class="faq-item">
-        <div class="faq-question">
+      <div class="faq-item" role="listitem">
+        <div class="faq-question" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-answer-2">
           <span class="q-icon">Q</span>
           <span class="q-text">BodyPilotはどんなサービスですか？</span>
-          <span class="faq-toggle">+</span>
+          <span class="faq-toggle" aria-hidden="true">+</span>
         </div>
-        <div class="faq-answer">
+        <div class="faq-answer" id="faq-answer-2" role="region">
           <div class="faq-answer-inner">スマホで食べ物を撮影するだけで、AIが食品の種類・大きさ・重さを推定し、カロリーや栄養素を自動計算する健康管理サービスです。毎日の栄養バランスをグラフで確認でき、健康的な食生活をサポートします。</div>
         </div>
       </div>
-      <div class="faq-item">
-        <div class="faq-question">
+      <div class="faq-item" role="listitem">
+        <div class="faq-question" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-answer-3">
           <span class="q-icon">Q</span>
           <span class="q-text">スマホから利用できますか？</span>
-          <span class="faq-toggle">+</span>
+          <span class="faq-toggle" aria-hidden="true">+</span>
         </div>
-        <div class="faq-answer">
+        <div class="faq-answer" id="faq-answer-3" role="region">
           <div class="faq-answer-inner">はい、スマホのブラウザからそのままご利用いただけます。iPhone・Android両方に対応しており、カメラ機能を使って食事を撮影できます。</div>
         </div>
       </div>
-      <div class="faq-item">
-        <div class="faq-question">
+      <div class="faq-item" role="listitem">
+        <div class="faq-question" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-answer-4">
           <span class="q-icon">Q</span>
           <span class="q-text">体重や食事内容を人に見られたくないのですが、プライバシー面は安全ですか？</span>
-          <span class="faq-toggle">+</span>
+          <span class="faq-toggle" aria-hidden="true">+</span>
         </div>
-        <div class="faq-answer">
+        <div class="faq-answer" id="faq-answer-4" role="region">
           <div class="faq-answer-inner">お客様の食事データは暗号化して保管しており、他のユーザーに公開されることはありません。公開設定はすべてご自身で管理できます。安心してご利用ください。</div>
         </div>
       </div>
@@ -440,16 +493,16 @@
     <div class="section-label-dots"></div>
     <div class="section-label">ダイエットしたい人必見！お役立ちコンテンツ</div>
     <div class="section-title">健康コラム</div>
-    <div class="tips-tags">
-      <span class="tip-tag active">ダイエット継続</span>
-      <span class="tip-tag">たんぱく質不足解消</span>
-      <span class="tip-tag">筋トレしたい</span>
-      <span class="tip-tag">減塩</span>
-      <span class="tip-tag">睡眠ケア</span>
+    <div class="tips-tags" role="tablist" aria-label="コラムカテゴリー">
+      <span class="tip-tag active" role="tab" tabindex="0" aria-selected="true">ダイエット継続</span>
+      <span class="tip-tag" role="tab" tabindex="0" aria-selected="false">たんぱく質不足解消</span>
+      <span class="tip-tag" role="tab" tabindex="0" aria-selected="false">筋トレしたい</span>
+      <span class="tip-tag" role="tab" tabindex="0" aria-selected="false">減塩</span>
+      <span class="tip-tag" role="tab" tabindex="0" aria-selected="false">睡眠ケア</span>
     </div>
     <div class="tips-grid">
       <div class="tip-card fade-in">
-        <div class="tip-image">🍙</div>
+        <div class="tip-image" aria-hidden="true">🍙</div>
         <div class="tip-body">
           <div class="tip-category">記事</div>
           <h4>朝ご飯抜きは太る原因に？ダイエットに欠かせない理由と疑問を解決</h4>
@@ -457,7 +510,7 @@
         </div>
       </div>
       <div class="tip-card fade-in">
-        <div class="tip-image">🥗</div>
+        <div class="tip-image" aria-hidden="true">🥗</div>
         <div class="tip-body">
           <div class="tip-category">記事</div>
           <h4>ダイエッターに「そば」が人気！栄養バランスを整うおすすめカスタマイズ</h4>
@@ -465,7 +518,7 @@
         </div>
       </div>
       <div class="tip-card fade-in">
-        <div class="tip-image">🏋️</div>
+        <div class="tip-image" aria-hidden="true">🏋️</div>
         <div class="tip-body">
           <div class="tip-category">動画</div>
           <h4>座ってできる内ももトレーニング！在宅ワーカー向けエクササイズ</h4>
@@ -479,9 +532,9 @@
   <section class="cta">
     <div class="section-label-dots"></div>
     <div class="section-label">BodyPilotを試そうか迷っている方へ</div>
-    <h2>まずは「簡単カロリー<br>・栄養素計算」<br>を試してみませんか？</h2>
-    <p>無料で食事管理をスタートできます</p>
-    <a href="pages/register.html" class="btn btn-primary btn-lg">簡単カロリー・栄養素計算を使ってみる</a>
+    <h2>まずは無料で<br>食事管理を<br>始めてみませんか？</h2>
+    <p>会員登録ですぐにスタートできます</p>
+    <a href="pages/register.html" class="btn btn-primary btn-lg" aria-label="無料で会員登録する">無料で会員登録する</a>
     <br>
     <a href="#" class="cta-sub-link">「健康を考えるブランド」を持つ企業様へ</a>
   </section>
@@ -501,40 +554,40 @@
     </div>
     <div class="footer-links">
       <div class="footer-links-inner">
-        <div class="footer-links-grid">
+        <nav class="footer-links-grid" role="navigation" aria-label="フッターナビゲーション">
           <div>
             <h4>サービス</h4>
-            <a href="#">簡単/無料カロリー計算</a>
-            <a href="#">ダイエット日記</a>
-            <a href="#">みんなの日記</a>
+            <a href="pages/register.html">無料会員登録</a>
+            <a href="#" onclick="showToast('この機能は近日公開予定です', 'info'); return false;">ダイエット日記</a>
+            <a href="#" onclick="showToast('この機能は近日公開予定です', 'info'); return false;">みんなの日記</a>
           </div>
           <div>
             <h4>コラム</h4>
-            <a href="#">健康コラム</a>
-            <a href="#">レシピ</a>
-            <a href="#">動画</a>
+            <a href="#tips">健康コラム</a>
+            <a href="#" onclick="showToast('この機能は近日公開予定です', 'info'); return false;">レシピ</a>
+            <a href="#" onclick="showToast('この機能は近日公開予定です', 'info'); return false;">動画</a>
           </div>
           <div>
             <h4>レシピ</h4>
-            <a href="#">野菜のおかず</a>
-            <a href="#">肉のおかず</a>
-            <a href="#">魚のおかず</a>
-            <a href="#">ごはん・めん</a>
+            <a href="#" onclick="showToast('この機能は近日公開予定です', 'info'); return false;">野菜のおかず</a>
+            <a href="#" onclick="showToast('この機能は近日公開予定です', 'info'); return false;">肉のおかず</a>
+            <a href="#" onclick="showToast('この機能は近日公開予定です', 'info'); return false;">魚のおかず</a>
+            <a href="#" onclick="showToast('この機能は近日公開予定です', 'info'); return false;">ごはん・めん</a>
           </div>
           <div>
             <h4>その他</h4>
-            <a href="#">ショップ</a>
+            <a href="#" onclick="showToast('この機能は近日公開予定です', 'info'); return false;">ショップ</a>
           </div>
-        </div>
+        </nav>
       </div>
     </div>
     <div class="footer-legal">
       <div class="footer-legal-inner">
-        <a href="#">利用規約</a>
-        <a href="#">プライバシーポリシー</a>
-        <a href="#">個人情報保護方針</a>
-        <a href="#">FAQ・問い合わせ</a>
-        <a href="#">運営会社について</a>
+        <a href="pages/terms.html">利用規約</a>
+        <a href="pages/privacy.html">プライバシーポリシー</a>
+        <a href="pages/privacy.html">個人情報保護方針</a>
+        <a href="#faq">FAQ・問い合わせ</a>
+        <a href="#" onclick="showToast('この機能は近日公開予定です', 'info'); return false;">運営会社について</a>
       </div>
     </div>
     <div class="footer-bottom">
@@ -542,6 +595,15 @@
     </div>
   </footer>
 
-  <script src="js/main.js"></script>
+  <!-- トースト通知コンテナ -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/main.js" defer></script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+  </script>
 </body>
 </html>

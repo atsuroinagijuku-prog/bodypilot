@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>レポート - BodyPilot</title>
+  <meta name="description" content="BodyPilotレポート - 週間・月間の栄養バランスと体重推移を確認。">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#7B8B2E">
+  <link rel="icon" type="image/svg+xml" href="../images/icon-192.svg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <script>
+    (function() {
+      var saved = localStorage.getItem('bp_theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    })();
+  </script>
+  <style>
+    .reports-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .reports-grid .card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Period Toggle Buttons */
+    .period-toggle {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .period-btn {
+      padding: 6px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: var(--white);
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text-sub);
+    }
+
+    .period-btn.active {
+      background: var(--green);
+      color: var(--white);
+      border-color: var(--green);
+    }
+
+    /* Chart.js Canvas Container */
+    .chart-canvas-wrap {
+      position: relative;
+      width: 100%;
+      max-height: 280px;
+    }
+
+    .chart-canvas-wrap canvas {
+      width: 100% !important;
+      max-height: 280px;
+    }
+
+    /* Date Range Picker */
+    .date-range-picker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .date-range-picker input[type="date"] {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.82rem;
+      background: var(--cream);
+      color: var(--text);
+    }
+
+    .date-range-picker input[type="date"]:focus {
+      outline: none;
+      border-color: var(--green);
+    }
+
+    .date-range-picker span {
+      color: var(--text-sub);
+      font-size: 0.85rem;
+    }
+
+    .date-range-picker button {
+      padding: 6px 16px;
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .date-range-picker button:hover {
+      background: var(--green-light);
+    }
+
+    /* BMI Card */
+    .bmi-card {
+      text-align: center;
+      padding: 16px;
+    }
+
+    .bmi-value {
+      font-size: 2.8rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .bmi-category {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .bmi-detail {
+      font-size: 0.78rem;
+      color: var(--text-sub);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .bmi-target {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 4px 12px;
+      background: var(--cream);
+      border-radius: 8px;
+      font-size: 0.78rem;
+      color: var(--text-sub);
+      font-weight: 600;
+    }
+
+    .bmi-no-data {
+      text-align: center;
+      color: var(--text-light);
+      padding: 20px;
+      font-size: 0.85rem;
+    }
+
+    /* Averages */
+    .avg-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .avg-item {
+      background: var(--cream);
+      border-radius: 10px;
+      padding: 12px 14px;
+      text-align: center;
+    }
+
+    .avg-label {
+      font-size: 0.72rem;
+      color: var(--text-sub);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .avg-value {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--green);
+      line-height: 1.2;
+    }
+
+    .avg-unit {
+      font-size: 0.7rem;
+      color: var(--text-sub);
+      font-weight: 600;
+    }
+
+    .avg-sub {
+      font-size: 0.68rem;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+
+    /* Streak / Heatmap */
+    .streak-display {
+      text-align: center;
+      padding: 12px 0 4px;
+    }
+
+    .streak-number {
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--green);
+      line-height: 1;
+    }
+
+    .streak-label {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .streak-sub {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: 8px;
+    }
+
+    /* Heatmap */
+    .heatmap-container {
+      margin-top: 12px;
+      overflow-x: auto;
+    }
+
+    .heatmap-grid {
+      display: grid;
+      grid-template-rows: repeat(7, 12px);
+      grid-auto-flow: column;
+      gap: 2px;
+      justify-content: start;
+    }
+
+    .heatmap-cell {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      background: var(--border);
+    }
+
+    .heatmap-cell.level-1 { background: #c6e48b; }
+    .heatmap-cell.level-2 { background: #7bc96f; }
+    .heatmap-cell.level-3 { background: #239a3b; }
+    .heatmap-cell.level-4 { background: #196127; }
+
+    [data-theme="dark"] .heatmap-cell { background: #2d333b; }
+    [data-theme="dark"] .heatmap-cell.level-1 { background: #0e4429; }
+    [data-theme="dark"] .heatmap-cell.level-2 { background: #006d32; }
+    [data-theme="dark"] .heatmap-cell.level-3 { background: #26a641; }
+    [data-theme="dark"] .heatmap-cell.level-4 { background: #39d353; }
+
+    .heatmap-legend {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+      font-size: 0.65rem;
+      color: var(--text-light);
+      justify-content: flex-end;
+    }
+
+    .heatmap-legend .heatmap-cell {
+      width: 10px;
+      height: 10px;
+    }
+
+    /* Export Buttons */
+    .export-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-export-chart {
+      padding: 6px 14px;
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-export-chart:hover {
+      background: var(--green-light);
+    }
+
+    .no-data-message {
+      text-align: center;
+      color: var(--text-light);
+      padding: 24px;
+      font-size: 0.85rem;
+    }
+
+    /* Report Controls */
+    .report-controls {
+      max-width: 900px;
+      margin: 0 auto 16px;
+    }
+
+    .quick-range-buttons {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .quick-range-buttons button {
+      padding: 6px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: var(--white);
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text-sub);
+    }
+
+    .quick-range-buttons button.active {
+      background: var(--green);
+      color: var(--white);
+      border-color: var(--green);
+    }
+
+    .quick-range-buttons button:hover:not(.active) {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    /* Report Actions */
+    .report-actions {
+      display: flex;
+      gap: 8px;
+      max-width: 900px;
+      margin: 0 auto 16px;
+      flex-wrap: wrap;
+    }
+
+    /* Stats summary grid (wider) */
+    .stats-grid-wide {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .reports-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .avg-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .chart-canvas-wrap {
+        max-height: 220px;
+      }
+
+      .chart-canvas-wrap canvas {
+        max-height: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">メインコンテンツにスキップ</a>
+  <!-- ヘッダー -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="dashboard.html" class="logo" aria-label="BodyPilot ダッシュボード">
+        <span class="logo-icon">B</span>
+        Body<span class="logo-accent">Pilot</span>
+      </a>
+      <nav class="nav" role="navigation" aria-label="レポートナビゲーション">
+        <a href="dashboard.html">ダッシュボード</a>
+        <a href="planner.html">プランナー</a>
+        <a href="reports.html" style="color:var(--green); font-weight:700;">レポート</a>
+        <a href="settings.html">設定</a>
+        <a href="#" onclick="handleLogout(); return false;">ログアウト</a>
+      </nav>
+      <button class="hamburger" id="hamburger" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="dashboard" role="main" id="main-content">
+    <div class="dashboard-header">
+      <div>
+        <h2>レポート</h2>
+        <span class="date-display" id="report-period"></span>
+      </div>
+      <div class="health-score-badge">
+        <span class="score-label">記録継続</span>
+        <span class="score-num" id="streak-badge">0</span>
+        <span class="score-unit">日</span>
+      </div>
+    </div>
+
+    <!-- Report Controls -->
+    <div class="report-controls">
+      <div class="date-range-picker">
+        <label>期間:</label>
+        <input type="date" id="report-start-date">
+        <span>〜</span>
+        <input type="date" id="report-end-date">
+        <button onclick="updateReports()" class="btn btn-primary btn-sm">適用</button>
+      </div>
+      <div class="quick-range-buttons">
+        <button onclick="setRange(7)">7日</button>
+        <button onclick="setRange(30)" class="active">30日</button>
+        <button onclick="setRange(90)">90日</button>
+        <button onclick="setRange(180)">180日</button>
+        <button onclick="setRange(365)">1年</button>
+      </div>
+    </div>
+
+    <!-- Export Buttons -->
+    <div class="report-actions">
+      <button class="btn-export-chart" onclick="exportAllChartsAsImage()">画像で保存</button>
+      <button class="btn-export-chart" onclick="exportReportCSV()">CSV出力</button>
+    </div>
+
+    <div class="reports-grid">
+      <!-- カロリートレンド -->
+      <div class="card full-width">
+        <div class="card-title">カロリートレンド</div>
+        <div class="period-toggle" id="cal-period-toggle">
+          <button class="period-btn active" onclick="setCalPeriod(7)">7日</button>
+          <button class="period-btn" onclick="setCalPeriod(14)">14日</button>
+          <button class="period-btn" onclick="setCalPeriod(30)">30日</button>
+          <button class="period-btn" onclick="setCalPeriod(90)">90日</button>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="cal-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- 栄養バランス推移 (Multi-line) -->
+      <div class="card full-width">
+        <div class="card-title">栄養バランス推移</div>
+        <div class="period-toggle" id="macro-period-toggle">
+          <button class="period-btn active" onclick="setMacroPeriod(7)">7日</button>
+          <button class="period-btn" onclick="setMacroPeriod(14)">14日</button>
+          <button class="period-btn" onclick="setMacroPeriod(30)">30日</button>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="macro-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- 栄養バランス (Radar) -->
+      <div class="card">
+        <div class="card-title">栄養バランス</div>
+        <div class="period-toggle" id="nutr-period-toggle">
+          <button class="period-btn active" onclick="setNutrPeriod(7)">7日</button>
+          <button class="period-btn" onclick="setNutrPeriod(14)">14日</button>
+          <button class="period-btn" onclick="setNutrPeriod(30)">30日</button>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="nutrition-radar-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- PFC比率 (Doughnut) -->
+      <div class="card">
+        <div class="card-title">PFC比率</div>
+        <div class="period-toggle" id="pfc-period-toggle">
+          <button class="period-btn active" onclick="setPfcPeriod(7)">7日</button>
+          <button class="period-btn" onclick="setPfcPeriod(30)">30日</button>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="pfc-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- BMI & 体組成 -->
+      <div class="card">
+        <div class="card-title">BMI / 体組成</div>
+        <div id="bmi-display"></div>
+      </div>
+
+      <!-- 体重トレンド -->
+      <div class="card full-width">
+        <div class="card-title">体重トレンド</div>
+        <div class="period-toggle" id="weight-period-toggle">
+          <button class="period-btn active" onclick="setWeightPeriod(30)">30日</button>
+          <button class="period-btn" onclick="setWeightPeriod(90)">90日</button>
+          <button class="period-btn" onclick="setWeightPeriod(180)">180日</button>
+          <button class="period-btn" onclick="setWeightPeriod(365)">365日</button>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="weight-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- 運動カロリー -->
+      <div class="card">
+        <div class="card-title">運動消費カロリー（週間）</div>
+        <div class="chart-canvas-wrap">
+          <canvas id="exercise-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- 水分摂取 -->
+      <div class="card">
+        <div class="card-title">水分摂取（7日間）</div>
+        <div class="chart-canvas-wrap">
+          <canvas id="water-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- 統計サマリー -->
+      <div class="card full-width">
+        <div class="card-title">統計サマリー</div>
+        <div id="stats-summary" class="avg-grid"></div>
+      </div>
+
+      <!-- 記録継続 & ヒートマップ -->
+      <div class="card full-width">
+        <div class="card-title">記録の継続</div>
+        <div class="streak-display">
+          <div class="streak-number" id="streak-count">0</div>
+          <div class="streak-label">連続記録日数</div>
+          <div class="streak-sub" id="streak-detail"></div>
+        </div>
+        <div class="heatmap-container">
+          <div class="heatmap-grid" id="heatmap-grid"></div>
+          <div class="heatmap-legend">
+            <span>少</span>
+            <div class="heatmap-cell"></div>
+            <div class="heatmap-cell level-1"></div>
+            <div class="heatmap-cell level-2"></div>
+            <div class="heatmap-cell level-3"></div>
+            <div class="heatmap-cell level-4"></div>
+            <span>多</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/store.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/reports.js"></script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('../sw.js');
+  }
+  </script>
+</body>
+</html>

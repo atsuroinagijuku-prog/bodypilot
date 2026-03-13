@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>食事記録 - BodyPilot</title>
+  <meta name="description" content="BodyPilot 食事記録 - 朝食・昼食・夕食・間食のカロリー・栄養素を記録・管理。">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#7B8B2E">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="icon" type="image/svg+xml" href="../images/icon-192.svg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/app.css">
+  <style>
+    /* === Meal Page Specific Styles (asken benchmark) === */
+
+    /* Layout: main + sidebar */
+    .app-content {
+      display: flex;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+      gap: 24px;
+    }
+    .content-main {
+      flex: 1;
+      min-width: 0;
+    }
+    .content-sidebar {
+      width: 280px;
+      flex-shrink: 0;
+    }
+
+    /* Date header */
+    .page-date-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 12px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+    .page-date-header h2 {
+      font-size: 1.1rem;
+      margin: 0;
+    }
+    .date-arrow-btn {
+      background: var(--green-light, #9AB030);
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+    .date-arrow-btn:hover {
+      background: var(--green, #7B8B2E);
+    }
+    .prev-day-link {
+      font-size: 0.85rem;
+      color: var(--green, #7B8B2E);
+      text-decoration: underline;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+
+    /* Record list header with sub-tabs */
+    .record-list-header {
+      background: var(--green, #7B8B2E);
+      color: white;
+      padding: 10px 16px 0;
+      border-radius: 4px 4px 0 0;
+      margin-bottom: 0;
+    }
+    .record-list-header h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+    .record-sub-tabs {
+      display: flex;
+      gap: 0;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .record-sub-tab {
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.85);
+      cursor: pointer;
+      font-size: 0.85rem;
+      border-radius: 4px 4px 0 0;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .record-sub-tab:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    .record-sub-tab.active {
+      background: white;
+      color: var(--green, #7B8B2E);
+      font-weight: bold;
+    }
+
+    /* Calorie Data Table (asken style) */
+    .calorie-table {
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      background: white;
+    }
+    .calorie-table-header {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      background: var(--green, #7B8B2E);
+      color: white;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+    .calorie-table-header span {
+      padding: 8px 12px;
+      text-align: center;
+    }
+    .calorie-table-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      border-bottom: 1px solid #eee;
+      font-size: 0.9rem;
+    }
+    .calorie-table-row span {
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .calorie-table-row .label {
+      text-align: left;
+      font-weight: bold;
+      background: #f9f9f9;
+    }
+    .calorie-table-row .value.positive {
+      color: var(--green, #7B8B2E);
+      font-weight: bold;
+    }
+    .calorie-table-row .value.negative {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+    .calorie-link {
+      text-align: right;
+      padding: 8px 12px;
+      border-top: 1px solid #eee;
+    }
+    .calorie-link a {
+      color: var(--green, #7B8B2E);
+      font-size: 0.85rem;
+      text-decoration: underline;
+    }
+
+    /* Body Record (karada) */
+    .body-record-section {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .body-record-section-header {
+      background: var(--green, #7B8B2E);
+      color: white;
+      padding: 8px 16px;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+    .body-record {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 12px 16px;
+      background: var(--green-bg, #F0F4E0);
+      border-radius: 0;
+      margin-bottom: 0;
+    }
+    .btn-save-body {
+      background: var(--green, #7B8B2E);
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .btn-save-body:hover {
+      background: var(--green-light, #9AB030);
+    }
+
+    /* Advice Button */
+    .btn-advice {
+      display: block;
+      width: 100%;
+      max-width: 400px;
+      margin: 16px auto;
+      padding: 14px 24px;
+      background: var(--green, #7B8B2E);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-advice:hover {
+      background: var(--green-light, #9AB030);
+    }
+
+    /* Download / Prev-day links */
+    .action-links {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+    }
+    .action-links a {
+      color: var(--green, #7B8B2E);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* Meal Sections (asken style) */
+    .meal-section {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      background: white;
+    }
+    .meal-section-header {
+      background: var(--green-light, #9AB030);
+      color: white;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+    .meal-section-header .meal-icon {
+      margin-right: 6px;
+    }
+    .meal-section-body {
+      padding: 12px 16px;
+      min-height: 50px;
+    }
+    .meal-section-footer {
+      padding: 8px 16px;
+      text-align: right;
+      background: #fafafa;
+      border-top: 1px solid #eee;
+    }
+    .btn-record {
+      background: var(--green, #7B8B2E);
+      color: white;
+      border: none;
+      padding: 8px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .btn-record:hover {
+      background: var(--green-light, #9AB030);
+    }
+    .btn-record::after {
+      content: ' >';
+    }
+
+    .meal-empty {
+      color: var(--text-light, #666);
+      font-size: 0.9rem;
+    }
+    .meal-empty a, .meal-skip-link {
+      color: var(--green, #7B8B2E);
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .meal-items, .exercise-items {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .meal-item, .exercise-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .meal-item:last-child, .exercise-item:last-child {
+      border-bottom: none;
+    }
+    .meal-item-info {
+      flex: 1;
+    }
+    .meal-item-name {
+      font-size: 0.9rem;
+    }
+    .meal-item-detail {
+      font-size: 0.8rem;
+      color: var(--text-sub, #5A5A5A);
+    }
+    .meal-item-cal {
+      font-weight: bold;
+      min-width: 70px;
+      text-align: right;
+      font-size: 0.9rem;
+    }
+    .meal-item-delete {
+      background: none;
+      border: none;
+      color: #ccc;
+      cursor: pointer;
+      font-size: 1.2rem;
+      margin-left: 8px;
+      padding: 4px;
+    }
+    .meal-item-delete:hover {
+      color: #e74c3c;
+    }
+
+    /* Myルール Section */
+    .my-rules-section {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .my-rules-header {
+      background: var(--green, #7B8B2E);
+      color: white;
+      padding: 8px 16px;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+    .my-rules-body {
+      padding: 12px 16px;
+    }
+    .my-rules-body .rule-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 0.9rem;
+    }
+    .my-rules-body .rule-item:last-child {
+      border-bottom: none;
+    }
+    .my-rules-body .rule-text {
+      flex: 1;
+    }
+    .rule-check-btns {
+      display: flex;
+      gap: 4px;
+    }
+    .rule-check-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      background: white;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .rule-check-btn.ok {
+      border-color: var(--green, #7B8B2E);
+      color: var(--green, #7B8B2E);
+    }
+    .rule-check-btn.ok.active {
+      background: var(--green, #7B8B2E);
+      color: white;
+    }
+    .rule-check-btn.ng {
+      border-color: #e74c3c;
+      color: #e74c3c;
+    }
+    .rule-check-btn.ng.active {
+      background: #e74c3c;
+      color: white;
+    }
+    .my-rules-empty {
+      color: var(--text-sub, #5A5A5A);
+      font-size: 0.85rem;
+    }
+    .my-rules-empty a {
+      color: var(--green, #7B8B2E);
+      text-decoration: underline;
+    }
+
+    /* Sidebar calendar */
+    .sidebar-calendar {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .sidebar-calendar h3 {
+      background: var(--green, #7B8B2E);
+      color: white;
+      padding: 8px 16px;
+      margin: 0;
+      font-size: 0.9rem;
+    }
+    .calendar-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      background: var(--green-bg, #F0F4E0);
+    }
+    .calendar-nav button {
+      background: none;
+      border: none;
+      color: var(--green, #7B8B2E);
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .calendar-month {
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      padding: 4px;
+    }
+    .calendar-grid .cal-header {
+      text-align: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+      padding: 4px;
+      color: var(--text-sub);
+    }
+    .calendar-grid .cal-header.sun { color: #e74c3c; }
+    .calendar-grid .cal-header.sat { color: #3498db; }
+    .calendar-grid .calendar-date {
+      text-align: center;
+      padding: 6px 2px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .calendar-grid .calendar-date:hover { background: var(--green-bg, #F0F4E0); }
+    .calendar-grid .calendar-date.today {
+      background: var(--green, #7B8B2E);
+      color: white;
+      border-radius: 50%;
+    }
+    .calendar-grid .calendar-date.selected {
+      outline: 2px solid var(--green-light, #9AB030);
+    }
+    .calendar-grid .calendar-date.has-record {
+      font-weight: bold;
+      color: var(--green, #7B8B2E);
+    }
+    .calendar-grid .calendar-date.other-month {
+      color: #ccc;
+      cursor: default;
+    }
+    .calendar-grid .calendar-date.empty {
+      cursor: default;
+    }
+
+    /* Advice modal */
+    .advice-modal-content {
+      background: white;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 24px;
+      position: relative;
+    }
+    .advice-text {
+      white-space: pre-line;
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    /* Record modal */
+    .record-modal-content {
+      max-width: 600px;
+    }
+    .food-search-area input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    .food-results {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      margin-top: 8px;
+    }
+    .food-results-empty {
+      padding: 24px;
+      text-align: center;
+      color: var(--text-sub);
+    }
+    .food-result-name {
+      font-size: 0.9rem;
+    }
+    .food-result-meta {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+    }
+    .food-result-cal {
+      font-weight: bold;
+      color: var(--green, #7B8B2E);
+      white-space: nowrap;
+    }
+    .quantity-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .quantity-input input {
+      width: 100px;
+      padding: 8px;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    .preview-cal {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--green, #7B8B2E);
+      margin-bottom: 4px;
+    }
+    #nutrition-preview {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+    }
+
+    /* Exercise modal */
+    .exercise-result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+    }
+    .exercise-result-item:hover {
+      background: var(--green-bg, #F0F4E0);
+    }
+    .exercise-duration-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .exercise-duration-input input {
+      width: 80px;
+      padding: 8px;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    /* btn-primary */
+    .btn-primary {
+      background: var(--green, #7B8B2E);
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+    .btn-primary:hover {
+      background: var(--green-light, #9AB030);
+    }
+
+    /* Dark mode overrides */
+    [data-theme="dark"] .calorie-table,
+    [data-theme="dark"] .body-record-section,
+    [data-theme="dark"] .meal-section,
+    [data-theme="dark"] .my-rules-section,
+    [data-theme="dark"] .sidebar-calendar {
+      background: #2a2a3e;
+      border-color: #3a3a4e;
+    }
+    [data-theme="dark"] .calorie-table-row .label {
+      background: #1e1e30;
+    }
+    [data-theme="dark"] .meal-section-footer {
+      background: #1e1e30;
+    }
+    [data-theme="dark"] .page-date-header {
+      background: #2a2a3e;
+      border-color: #3a3a4e;
+    }
+    [data-theme="dark"] .advice-modal-content {
+      background: #2a2a3e;
+    }
+    [data-theme="dark"] .record-sub-tab.active {
+      background: #2a2a3e;
+      color: #C5D45A;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .app-content {
+        flex-direction: column;
+        padding: 12px;
+      }
+      .content-sidebar {
+        width: 100%;
+      }
+      .body-record {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .record-sub-tabs {
+        overflow-x: auto;
+      }
+      .action-links {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+      }
+    }
+    @media (max-width: 480px) {
+      .calorie-table-header,
+      .calorie-table-row {
+        font-size: 0.75rem;
+      }
+      .calorie-table-header span,
+      .calorie-table-row span {
+        padding: 6px 4px;
+      }
+    }
+  </style>
+  <script>
+    (function() {
+      var saved = localStorage.getItem('bp_theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    })();
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">メインコンテンツにスキップ</a>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <a href="../index.html" class="app-logo">BodyPilot</a>
+    <div class="app-user-area">
+      <span id="user-name"></span>
+      <a href="settings.html" class="header-link">設定</a>
+      <button onclick="handleLogout()" class="logout-btn">ログアウト</button>
+    </div>
+  </header>
+
+  <!-- App Navigation -->
+  <nav class="app-nav" role="navigation" aria-label="メインナビゲーション">
+    <a href="meal.html" class="app-nav-item active">食事記録</a>
+    <a href="diary.html" class="app-nav-item">日記</a>
+    <a href="graph.html" class="app-nav-item">グラフ</a>
+    <a href="goals.html" class="app-nav-item">目標設定</a>
+    <a href="calculator.html" class="app-nav-item">簡単カロリー計算</a>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="app-content" id="main-content">
+
+    <!-- Center: Main Content -->
+    <div class="content-main">
+
+      <!-- Date Navigation -->
+      <div class="page-date-header">
+        <button class="date-arrow-btn" onclick="prevDay()" aria-label="前日">&#8592;</button>
+        <h2 id="date-display">2026年3月13日(金)</h2>
+        <button class="date-arrow-btn" onclick="nextDay()" aria-label="翌日">&#8594;</button>
+        <a class="prev-day-link" onclick="prevDay()">前日の分を入力</a>
+      </div>
+
+      <!-- Record List Header with sub-tabs -->
+      <div class="record-list-header">
+        <h3>記録一覧</h3>
+        <ul class="record-sub-tabs" id="record-sub-tabs">
+          <li class="record-sub-tab active" onclick="scrollToSection('朝食')">朝食</li>
+          <li class="record-sub-tab" onclick="scrollToSection('昼食')">昼食</li>
+          <li class="record-sub-tab" onclick="scrollToSection('夕食')">夕食</li>
+          <li class="record-sub-tab" onclick="scrollToSection('間食')">間食</li>
+        </ul>
+      </div>
+
+      <!-- Calorie Data Table -->
+      <div id="calorie-data"></div>
+
+      <!-- Body Record (カラダの記録) -->
+      <div class="body-record-section">
+        <div class="body-record-section-header">カラダの記録</div>
+        <div class="body-record">
+          <label for="body-weight">今日の体重</label>
+          <div class="input-with-unit">
+            <input type="number" id="body-weight" step="0.1" min="20" max="300" placeholder="--">
+            <span class="input-unit">kg</span>
+          </div>
+          <label for="body-fat">体脂肪率</label>
+          <div class="input-with-unit">
+            <input type="number" id="body-fat" step="0.1" min="1" max="60" placeholder="--">
+            <span class="input-unit">%</span>
+          </div>
+          <label for="body-steps">今日の歩数</label>
+          <div class="input-with-unit">
+            <input type="number" id="body-steps" step="1" min="0" max="999999" placeholder="--">
+            <span class="input-unit">歩</span>
+          </div>
+          <button class="btn-save-body" onclick="saveBodyRecord()">登録する</button>
+        </div>
+      </div>
+
+      <!-- Advice Button (top) -->
+      <button class="btn-advice" onclick="showAdvice()">アドバイスを見る</button>
+
+      <!-- Action Links -->
+      <div class="action-links">
+        <a onclick="exportAsImage()" role="button">記録を画像でダウンロード</a>
+        <a onclick="prevDay()">前日の分を入力</a>
+      </div>
+
+      <!-- 朝食 -->
+      <div class="meal-section" id="section-朝食">
+        <div class="meal-section-header">
+          <span><span class="meal-icon">&#9728;</span>朝食</span>
+          <span class="meal-total" id="meal-total-朝食"></span>
+        </div>
+        <div class="meal-section-body" id="meal-body-朝食">
+          <p class="meal-empty">まだ記録されていません。</p>
+          <a class="meal-skip-link" onclick="skipMeal('朝食')">朝食を食べなかった</a>
+        </div>
+        <div class="meal-section-footer">
+          <button class="btn-record" onclick="openRecordModal('朝食')">記録する</button>
+        </div>
+      </div>
+
+      <!-- 昼食 -->
+      <div class="meal-section" id="section-昼食">
+        <div class="meal-section-header">
+          <span><span class="meal-icon">&#9729;</span>昼食</span>
+          <span class="meal-total" id="meal-total-昼食"></span>
+        </div>
+        <div class="meal-section-body" id="meal-body-昼食">
+          <p class="meal-empty">まだ記録されていません。</p>
+          <a class="meal-skip-link" onclick="skipMeal('昼食')">昼食を食べなかった</a>
+        </div>
+        <div class="meal-section-footer">
+          <button class="btn-record" onclick="openRecordModal('昼食')">記録する</button>
+        </div>
+      </div>
+
+      <!-- 夕食 -->
+      <div class="meal-section" id="section-夕食">
+        <div class="meal-section-header">
+          <span><span class="meal-icon">&#127769;</span>夕食</span>
+          <span class="meal-total" id="meal-total-夕食"></span>
+        </div>
+        <div class="meal-section-body" id="meal-body-夕食">
+          <p class="meal-empty">まだ記録されていません。</p>
+          <a class="meal-skip-link" onclick="skipMeal('夕食')">夕食を食べなかった</a>
+        </div>
+        <div class="meal-section-footer">
+          <button class="btn-record" onclick="openRecordModal('夕食')">記録する</button>
+        </div>
+      </div>
+
+      <!-- 間食 -->
+      <div class="meal-section" id="section-間食">
+        <div class="meal-section-header">
+          <span><span class="meal-icon">&#127856;</span>間食</span>
+          <span class="meal-total" id="meal-total-間食"></span>
+        </div>
+        <div class="meal-section-body" id="meal-body-間食">
+          <p class="meal-empty">まだ記録されていません。</p>
+          <a class="meal-skip-link" onclick="skipMeal('間食')">間食を食べなかった</a>
+        </div>
+        <div class="meal-section-footer">
+          <button class="btn-record" onclick="openRecordModal('間食')">記録する</button>
+        </div>
+      </div>
+
+      <!-- 運動 -->
+      <div class="meal-section" id="section-運動">
+        <div class="meal-section-header">
+          <span><span class="meal-icon">&#127939;</span>運動</span>
+          <span class="meal-total" id="exercise-total"></span>
+        </div>
+        <div class="meal-section-body" id="exercise-body">
+          <p class="meal-empty">まだ記録されていません。</p>
+          <a class="meal-skip-link" onclick="skipExercise()">運動をしなかった</a>
+        </div>
+        <div class="meal-section-footer">
+          <button class="btn-record" onclick="openExerciseModal()">記録する</button>
+        </div>
+      </div>
+
+      <!-- Advice Button (bottom) -->
+      <button class="btn-advice" onclick="showAdvice()">アドバイスを見る</button>
+
+      <!-- Myルール Section -->
+      <div class="my-rules-section">
+        <div class="my-rules-header">Myルール</div>
+        <div class="my-rules-body" id="my-rules-body">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Sidebar: Calendar -->
+    <div class="content-sidebar">
+      <div class="sidebar-calendar">
+        <h3>日付を選択してください</h3>
+        <div class="calendar-nav">
+          <button onclick="prevMonth()">&lt; 先月</button>
+          <span class="calendar-month" id="calendar-month-label"></span>
+          <button onclick="nextMonth()">来月 &gt;</button>
+        </div>
+        <div class="calendar-grid" id="calendar-grid"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Food Record Modal -->
+  <div class="modal-overlay" id="record-modal" role="dialog" aria-modal="true" aria-labelledby="record-modal-title" style="display:none">
+    <div class="modal-content record-modal-content">
+      <button class="modal-close" aria-label="閉じる" onclick="closeRecordModal()">&times;</button>
+      <h2 id="record-modal-title">朝食を記録</h2>
+
+      <!-- Search -->
+      <div class="food-search-area">
+        <input type="text" id="food-search-input" placeholder="食品名を検索..." oninput="searchFood(this.value)">
+      </div>
+
+      <!-- Category tabs -->
+      <div class="food-categories" id="food-categories"></div>
+
+      <!-- Results -->
+      <div class="food-results" id="food-results"></div>
+
+      <!-- Quantity panel -->
+      <div id="quantity-panel" style="display:none">
+        <h3 id="selected-food-name"></h3>
+        <div class="quantity-input">
+          <label>分量 (g):</label>
+          <input type="number" id="food-quantity" value="100" min="1" oninput="updateNutritionPreview()">
+        </div>
+        <div id="nutrition-preview"></div>
+        <button onclick="confirmAddFood()" class="btn-primary">記録する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exercise Record Modal -->
+  <div class="modal-overlay" id="exercise-modal" role="dialog" aria-modal="true" aria-label="運動を記録" style="display:none">
+    <div class="modal-content record-modal-content">
+      <button class="modal-close" aria-label="閉じる" onclick="closeExerciseModal()">&times;</button>
+      <h2>運動を記録</h2>
+
+      <!-- Exercise list -->
+      <div class="exercise-results" id="exercise-results"></div>
+
+      <!-- Duration panel -->
+      <div id="exercise-detail-panel" style="display:none">
+        <h3 id="selected-exercise-name"></h3>
+        <div class="exercise-duration-input">
+          <label>時間 (分):</label>
+          <input type="number" id="exercise-duration" value="30" min="1" oninput="updateExercisePreview()">
+        </div>
+        <p style="font-size:0.9rem;color:var(--text-sub);margin-bottom:12px;">消費カロリー: <strong id="exercise-cal-preview">0kcal</strong></p>
+        <button onclick="confirmAddExercise()" class="btn-primary">記録する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advice Modal -->
+  <div class="modal-overlay" id="advice-modal" role="dialog" aria-modal="true" aria-label="本日のアドバイス" style="display:none">
+    <div class="advice-modal-content">
+      <button class="modal-close" aria-label="閉じる" onclick="closeAdviceModal()">&times;</button>
+      <h2 style="color:var(--green);margin-bottom:16px;">本日のアドバイス</h2>
+      <div class="advice-text" id="advice-text"></div>
+      <button onclick="closeAdviceModal()" class="btn-primary" style="margin-top:20px;">閉じる</button>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="app-toast-container" class="app-toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Scripts -->
+  <script src="../js/i18n.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/food-db.js"></script>
+  <script src="../js/exercise-db.js"></script>
+  <script src="../js/store.js"></script>
+  <script src="../js/meal.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('../sw.js');
+    }
+  </script>
+</body>
+</html>

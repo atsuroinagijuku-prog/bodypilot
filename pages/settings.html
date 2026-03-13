@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>設定 - BodyPilot</title>
+  <meta name="description" content="BodyPilot設定 - プロフィール、目標カロリー、テーマ設定を管理。">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#7B8B2E">
+  <link rel="icon" type="image/svg+xml" href="../images/icon-192.svg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <script>
+    (function() {
+      var saved = localStorage.getItem('bp_theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    })();
+  </script>
+  <style>
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .settings-grid .card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .form-row .form-field {
+      flex: 1;
+    }
+
+    .form-field {
+      margin-bottom: 14px;
+    }
+
+    .form-field label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--text-sub);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .form-field input {
+      width: 100%;
+      padding: 9px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background: var(--cream);
+    }
+
+    .form-field input:focus {
+      outline: none;
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(123, 139, 46, 0.1);
+    }
+
+    .preset-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .preset-btn {
+      padding: 8px 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      font-size: 0.82rem;
+      font-weight: 600;
+      background: var(--white);
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text);
+    }
+
+    .preset-btn:hover,
+    .preset-btn.active {
+      background: var(--green);
+      color: var(--white);
+      border-color: var(--green);
+    }
+
+    .goal-inputs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+    }
+
+    .goal-field label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .goal-field input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      text-align: center;
+      font-weight: 600;
+      background: var(--cream);
+    }
+
+    .goal-field input:focus {
+      outline: none;
+      border-color: var(--green);
+    }
+
+    .danger-zone {
+      border: 1px solid #e55;
+      border-radius: var(--radius);
+      padding: 20px;
+      background: #fff5f5;
+    }
+
+    [data-theme="dark"] .danger-zone {
+      background: #2a1a1a;
+      border-color: #a33;
+    }
+
+    .danger-zone h4 {
+      color: #e55;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    .danger-zone p {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+    }
+
+    .btn-danger {
+      padding: 8px 20px;
+      background: #e55;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-danger:hover {
+      background: #c33;
+    }
+
+    .btn-export {
+      padding: 8px 20px;
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-export:hover {
+      background: var(--green-light);
+    }
+
+    .settings-section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .save-status {
+      font-size: 0.78rem;
+      color: var(--green);
+      font-weight: 600;
+      margin-left: 8px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .save-status.show {
+      opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+
+      .goal-inputs {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .preset-buttons {
+        flex-direction: column;
+      }
+
+      .preset-btn {
+        text-align: center;
+      }
+    }
+
+    /* Toggle Switch */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+      cursor: pointer;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      border-radius: 26px;
+      transition: 0.3s;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background-color: var(--green);
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+
+    [data-theme="dark"] .toggle-slider {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">メインコンテンツにスキップ</a>
+  <!-- ヘッダー -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="dashboard.html" class="logo" aria-label="BodyPilot ダッシュボード">
+        <span class="logo-icon">B</span>
+        Body<span class="logo-accent">Pilot</span>
+      </a>
+      <nav class="nav" role="navigation" aria-label="設定ナビゲーション">
+        <a href="dashboard.html">ダッシュボード</a>
+        <a href="planner.html">プランナー</a>
+        <a href="reports.html">レポート</a>
+        <a href="settings.html" style="color:var(--green); font-weight:700;">設定</a>
+        <a href="#" onclick="handleLogout(); return false;">ログアウト</a>
+      </nav>
+      <button class="hamburger" id="hamburger" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="dashboard" role="main" id="main-content">
+    <div class="dashboard-header">
+      <div>
+        <h2>設定</h2>
+        <span class="date-display">アカウントと目標の管理</span>
+      </div>
+    </div>
+
+    <div class="settings-grid">
+      <!-- プロフィール -->
+      <div class="card">
+        <div class="card-title">プロフィール</div>
+        <form id="profile-form">
+          <div class="form-field">
+            <label>ユーザー名</label>
+            <input type="text" id="profile-name" placeholder="名前を入力">
+          </div>
+          <div class="form-field">
+            <label>メールアドレス</label>
+            <input type="email" id="profile-email" placeholder="email@example.com" readonly>
+          </div>
+          <div class="form-field">
+            <label for="profile-height">身長 (cm) - BMI計算に使用</label>
+            <input type="number" id="profile-height" step="0.1" min="100" max="250" placeholder="170.0">
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">保存</button>
+          <span class="save-status" id="profile-status">保存しました</span>
+        </form>
+      </div>
+
+      <!-- 言語設定 -->
+      <div class="card">
+        <div class="card-title">表示設定</div>
+        <div class="form-field">
+          <label for="language-select">言語 / Language</label>
+          <select id="language-select" onchange="changeLanguage(this.value)" style="width:100%;padding:9px 14px;border:1px solid var(--border);border-radius:8px;font-size:0.9rem;background:var(--cream);color:var(--text);cursor:pointer;">
+            <option value="ja">日本語</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- データエクスポート -->
+      <div class="card">
+        <div class="card-title">データ管理</div>
+        <div class="settings-section-title">データエクスポート</div>
+        <p style="font-size:0.82rem; color:var(--text-sub); margin-bottom:12px;">
+          食事記録・体重・目標設定をJSON形式でダウンロードできます。
+        </p>
+        <button class="btn-export" id="btn-export" onclick="exportData()">JSONでエクスポート</button>
+
+        <div class="danger-zone" style="margin-top:20px;">
+          <h4>アカウント削除</h4>
+          <p>すべてのデータが完全に削除されます。この操作は取り消せません。</p>
+          <button class="btn-danger" id="btn-delete-account" onclick="deleteAccount()">アカウントを削除</button>
+        </div>
+      </div>
+
+      <!-- AI設定 -->
+      <div class="card">
+        <div class="card-title">AI設定</div>
+        <div class="settings-section-title">写真分析API</div>
+        <p style="font-size:0.82rem; color:var(--text-sub); margin-bottom:12px;">
+          OpenAI APIキーを設定すると、食事写真のAI分析精度が向上します。未設定でもローカル分析（色解析）が利用できます。
+        </p>
+        <div class="form-field">
+          <label for="vision-api-key">OpenAI APIキー</label>
+          <input type="password" id="vision-api-key" placeholder="sk-..." autocomplete="off">
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+          <button class="btn btn-primary btn-sm" id="btn-save-api-key" onclick="saveVisionApiKey()">保存</button>
+          <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--text);cursor:pointer;" onclick="clearVisionApiKey()">クリア</button>
+          <span class="save-status" id="api-key-status">保存しました</span>
+        </div>
+        <div id="vision-api-status" style="margin-top:10px;font-size:0.82rem;font-weight:600;"></div>
+      </div>
+
+      <!-- 通知設定 -->
+      <div class="card">
+        <div class="card-title">通知設定</div>
+        <div class="setting-item">
+          <div class="setting-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <label style="font-size:0.85rem;font-weight:600;">食事リマインダー通知</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="notification-toggle" onchange="toggleNotifications()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <p style="font-size:0.8rem;color:var(--text-sub);margin:0;">食事の記録を忘れないようにリマインダー通知を送ります</p>
+          <div id="notification-status" style="margin-top:8px;font-size:0.82rem;font-weight:600;"></div>
+        </div>
+      </div>
+
+      <!-- 目標設定 -->
+      <div class="card full-width">
+        <div class="card-title">目標カスタマイズ</div>
+        <div class="settings-section-title">プリセット</div>
+        <div class="preset-buttons">
+          <button class="preset-btn" onclick="applyPreset('loss')">減量 (1500kcal)</button>
+          <button class="preset-btn" onclick="applyPreset('muscle')">筋トレ (2500kcal)</button>
+          <button class="preset-btn" onclick="applyPreset('maintain')">維持 (2000kcal)</button>
+        </div>
+
+        <div class="settings-section-title">カスタム目標</div>
+        <form id="goals-form">
+          <div class="goal-inputs">
+            <div class="goal-field">
+              <label>カロリー (kcal)</label>
+              <input type="number" id="goal-cal" min="500" max="5000" step="50">
+            </div>
+            <div class="goal-field">
+              <label>タンパク質 (g)</label>
+              <input type="number" id="goal-protein" min="10" max="500" step="5">
+            </div>
+            <div class="goal-field">
+              <label>脂質 (g)</label>
+              <input type="number" id="goal-fat" min="10" max="300" step="5">
+            </div>
+            <div class="goal-field">
+              <label>炭水化物 (g)</label>
+              <input type="number" id="goal-carb" min="10" max="800" step="10">
+            </div>
+            <div class="goal-field">
+              <label>食物繊維 (g)</label>
+              <input type="number" id="goal-fiber" min="5" max="100" step="1">
+            </div>
+          </div>
+          <div style="margin-top:14px;">
+            <button type="submit" class="btn btn-primary btn-sm">目標を保存</button>
+            <span class="save-status" id="goals-status">保存しました</span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/store.js"></script>
+  <script src="../js/notifications.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/settings.js"></script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('../sw.js');
+  }
+  </script>
+</body>
+</html>

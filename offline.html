@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>オフライン - BodyPilot</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+      background: #FBF9F3;
+      color: #3A3A3A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .offline-card {
+      text-align: center;
+      background: #fff;
+      border-radius: 20px;
+      padding: 48px 32px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      max-width: 400px;
+      width: 100%;
+    }
+    .offline-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+    .offline-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #7B8B2E;
+    }
+    .offline-message {
+      font-size: 0.95rem;
+      color: #777;
+      line-height: 1.8;
+      margin-bottom: 24px;
+    }
+    .offline-btn {
+      display: inline-block;
+      background: #7B8B2E;
+      color: #fff;
+      padding: 12px 32px;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+    }
+    .offline-btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div class="offline-card">
+    <div class="offline-icon" aria-hidden="true">&#x1F4F6;</div>
+    <h1 class="offline-title">オフラインです</h1>
+    <p class="offline-message">
+      インターネット接続を確認してください。<br>
+      接続が回復したら、ページを再読み込みしてください。
+    </p>
+    <button class="offline-btn" onclick="location.reload()">再読み込み</button>
+  </div>
+</body>
+</html>

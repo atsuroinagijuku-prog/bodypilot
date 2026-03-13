@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>BodyPilot Tests</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #1a1a2e; color: #e0e0e0; }
+    .pass { color: #4CAF50; }
+    .fail { color: #f44336; }
+    .suite { margin: 20px 0; padding: 10px; border: 1px solid #333; }
+    .suite h2 { margin: 0 0 10px; color: #9AB030; }
+    .test { padding: 4px 0; }
+    .summary { margin-top: 20px; padding: 15px; font-size: 18px; border-top: 2px solid #333; }
+  </style>
+</head>
+<body>
+  <h1>BodyPilot Test Suite</h1>
+  <div id="results"></div>
+  <div id="summary" class="summary"></div>
+
+  <!-- Load app modules -->
+  <script>
+    // Mock localStorage for tests
+    const mockStorage = {};
+    const originalSetItem = localStorage.setItem.bind(localStorage);
+    const originalGetItem = localStorage.getItem.bind(localStorage);
+    const originalRemoveItem = localStorage.removeItem.bind(localStorage);
+  </script>
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/food-db.js"></script>
+  <script src="../js/store.js"></script>
+  <script src="../js/exercise-db.js"></script>
+
+  <script>
+    // Simple test framework
+    let totalTests = 0;
+    let passedTests = 0;
+    let failedTests = 0;
+    const results = document.getElementById('results');
+
+    function describe(name, fn) {
+      const suite = document.createElement('div');
+      suite.className = 'suite';
+      suite.innerHTML = `<h2>${name}</h2>`;
+      results.appendChild(suite);
+      window._currentSuite = suite;
+      fn();
+    }
+
+    function it(name, fn) {
+      totalTests++;
+      const div = document.createElement('div');
+      div.className = 'test';
+      try {
+        fn();
+        passedTests++;
+        div.innerHTML = `<span class="pass">&#x2713;</span> ${name}`;
+      } catch (e) {
+        failedTests++;
+        div.innerHTML = `<span class="fail">&#x2717;</span> ${name} &mdash; ${e.message}`;
+      }
+      window._currentSuite.appendChild(div);
+    }
+
+    function expect(actual) {
+      return {
+        toBe(expected) {
+          if (actual !== expected) throw new Error(`Expected ${expected}, got ${actual}`);
+        },
+        toEqual(expected) {
+          if (JSON.stringify(actual) !== JSON.stringify(expected))
+            throw new Error(`Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+        },
+        toBeGreaterThan(n) {
+          if (actual <= n) throw new Error(`Expected ${actual} > ${n}`);
+        },
+        toBeLessThan(n) {
+          if (actual >= n) throw new Error(`Expected ${actual} < ${n}`);
+        },
+        toBeTruthy() {
+          if (!actual) throw new Error(`Expected truthy, got ${actual}`);
+        },
+        toBeFalsy() {
+          if (actual) throw new Error(`Expected falsy, got ${actual}`);
+        },
+        toContain(item) {
+          if (Array.isArray(actual)) {
+            if (!actual.includes(item)) throw new Error(`Array doesn't contain ${item}`);
+          } else if (typeof actual === 'string') {
+            if (!actual.includes(item)) throw new Error(`String doesn't contain ${item}`);
+          }
+        },
+        toBeNull() {
+          if (actual !== null) throw new Error(`Expected null, got ${actual}`);
+        },
+        toBeInstanceOf(cls) {
+          if (!(actual instanceof cls)) throw new Error(`Expected instance of ${cls.name}`);
+        }
+      };
+    }
+
+    // Setup: create mock user session
+    function setup() {
+      localStorage.setItem('bp_user', JSON.stringify({ uid: 'test_user', email: 'test@test.com', name: 'Test' }));
+      // Initialize Auth so Store._key() can read currentUser
+      Auth.currentUser = { uid: 'test_user', email: 'test@test.com', name: 'Test' };
+    }
+
+    function teardown() {
+      // Clean up test data
+      for (let key in localStorage) {
+        if (key.startsWith('bp_test_user') || key === 'bp_user') {
+          localStorage.removeItem(key);
+        }
+      }
+    }
+
+    // ========== TESTS ==========
+
+    setup();
+
+    // FoodDB Tests
+    describe('FoodDB', () => {
+      it('should have more than 200 foods', () => {
+        expect(FoodDB.foods.length).toBeGreaterThan(200);
+      });
+
+      it('should search by name', () => {
+        const results = FoodDB.search('ラーメン');
+        expect(results.length).toBeGreaterThan(0);
+        expect(results[0].name).toContain('ラーメン');
+      });
+
+      it('should return empty for unknown food', () => {
+        const results = FoodDB.search('xyznonexistent');
+        expect(results.length).toBe(0);
+      });
+
+      it('should filter by category', () => {
+        const meats = FoodDB.getByCategory('肉');
+        expect(meats.length).toBeGreaterThan(0);
+        meats.forEach(f => expect(f.category).toBe('肉'));
+      });
+
+      it('should get food by ID', () => {
+        const food = FoodDB.getById(1);
+        expect(food).toBeTruthy();
+        expect(food.name).toContain('ごはん');
+      });
+
+      it('should calculate nutrition correctly', () => {
+        const food = { cal: 200, protein: 10, fat: 5, carb: 30, fiber: 2 };
+        const result = FoodDB.calculate(food, 150);
+        expect(result.cal).toBe(300);
+        expect(result.protein).toBe(15);
+      });
+
+      it('should have all required categories', () => {
+        const cats = FoodDB.getCategories();
+        expect(cats).toContain('ごはん');
+        expect(cats).toContain('肉');
+        expect(cats).toContain('野菜');
+        expect(cats).toContain('飲料');
+        expect(cats).toContain('コンビニ');
+      });
+
+      it('should have no duplicate IDs', () => {
+        const ids = FoodDB.foods.map(f => f.id);
+        const unique = new Set(ids);
+        expect(unique.size).toBe(ids.length);
+      });
+
+      it('should have valid nutrition values', () => {
+        FoodDB.foods.forEach(f => {
+          expect(f.cal >= 0).toBeTruthy();
+          expect(f.protein >= 0).toBeTruthy();
+          expect(f.fat >= 0).toBeTruthy();
+          expect(f.carb >= 0).toBeTruthy();
+        });
+      });
+    });
+
+    // Store Tests
+    describe('Store', () => {
+      it('should add and retrieve meals', () => {
+        const today = new Date().toISOString().split('T')[0];
+        Store.addMeal({ name: 'テスト食品', cal: 300, protein: 10, fat: 5, carb: 40, fiber: 2, weight: 200 });
+        const meals = Store.getMeals(today);
+        expect(meals.length).toBeGreaterThan(0);
+        expect(meals[meals.length - 1].name).toBe('テスト食品');
+      });
+
+      it('should calculate day totals', () => {
+        const today = new Date().toISOString().split('T')[0];
+        const total = Store.getDayTotal(today);
+        expect(total.cal).toBeGreaterThan(0);
+      });
+
+      it('should delete meals', () => {
+        const today = new Date().toISOString().split('T')[0];
+        const meals = Store.getMeals(today);
+        const mealId = meals[meals.length - 1].id;
+        Store.deleteMeal(today, mealId);
+        const after = Store.getMeals(today);
+        expect(after.length).toBe(meals.length - 1);
+      });
+
+      it('should add and retrieve weights', () => {
+        Store.addWeight(65.5, 15.2);
+        const weights = Store.getWeights();
+        expect(weights.length).toBeGreaterThan(0);
+        const last = weights[weights.length - 1];
+        expect(last.weight).toBe(65.5);
+      });
+
+      it('should get and set goals', () => {
+        Store.setGoals({ cal: 1800, protein: 90, fat: 50, carb: 200, fiber: 25 });
+        const goals = Store.getGoals();
+        expect(goals.cal).toBe(1800);
+        expect(goals.protein).toBe(90);
+      });
+
+      it('should return default goals if none set', () => {
+        // Clear goals
+        const uid = JSON.parse(localStorage.getItem('bp_user')).uid;
+        localStorage.removeItem(`bp_${uid}_goals`);
+        const goals = Store.getGoals();
+        expect(goals.cal).toBe(2000);
+      });
+
+      it('should get recent days data', () => {
+        const recent = Store.getRecentDays(7);
+        expect(recent.length).toBe(7);
+        recent.forEach(day => {
+          expect(day.date).toBeTruthy();
+        });
+      });
+    });
+
+    // ExerciseDB Tests
+    describe('ExerciseDB', () => {
+      it('should have exercises', () => {
+        const all = ExerciseDB.getAll();
+        expect(all.length).toBeGreaterThan(10);
+      });
+
+      it('should search exercises', () => {
+        const results = ExerciseDB.search('ウォーキング');
+        expect(results.length).toBeGreaterThan(0);
+      });
+
+      it('should calculate calories', () => {
+        const exercise = ExerciseDB.getAll()[0];
+        const cal = ExerciseDB.calculate(exercise, 30);
+        expect(cal).toBeGreaterThan(0);
+      });
+    });
+
+    // Cleanup
+    teardown();
+
+    // Show summary
+    document.getElementById('summary').innerHTML =
+      `<span class="${failedTests ? 'fail' : 'pass'}">` +
+      `${passedTests}/${totalTests} tests passed` +
+      `${failedTests ? `, ${failedTests} failed` : ''}` +
+      `</span>`;
+  </script>
+</body>
+</html>

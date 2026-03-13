@@ -36,8 +36,8 @@ img {
   --cream-dark: #F5F0E4;
   --yellow-green-bg: #F4F6E8;
   --text: #3A3A3A;
-  --text-sub: #777;
-  --text-light: #AAA;
+  --text-sub: #5A5A5A;
+  --text-light: #666;
   --border: #E8E4D9;
   --white: #FFFFFF;
   --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
@@ -46,6 +46,60 @@ img {
   --radius: 12px;
   --radius-lg: 20px;
   --radius-pill: 50px;
+  --header-bg: rgba(255, 255, 255, 0.97);
+  --input-bg: #FFFFFF;
+  --faq-question-bg: #8FA83A;
+  --faq-answer-bg: #FFFFFF;
+  --modal-overlay-bg: rgba(0,0,0,0.4);
+}
+
+/* ===== Dark Mode ===== */
+[data-theme="dark"] {
+  --green: #8FA83A;
+  --green-light: #A8C040;
+  --green-pale: #6A7A30;
+  --green-bg: #2A3020;
+  --cream: #222233;
+  --cream-dark: #1E1E2E;
+  --yellow-green-bg: #1E2218;
+  --text: #E0E0E0;
+  --text-sub: #B0B0B0;
+  --text-light: #999;
+  --border: #3A3A4E;
+  --white: #1A1A2E;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.3);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,0.4);
+  --header-bg: rgba(26, 26, 46, 0.97);
+  --input-bg: #2A2A3E;
+  --faq-question-bg: #6A7A30;
+  --faq-answer-bg: #2A2A3E;
+  --modal-overlay-bg: rgba(0,0,0,0.6);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --green: #8FA83A;
+    --green-light: #A8C040;
+    --green-pale: #6A7A30;
+    --green-bg: #2A3020;
+    --cream: #222233;
+    --cream-dark: #1E1E2E;
+    --yellow-green-bg: #1E2218;
+    --text: #E0E0E0;
+    --text-sub: #B0B0B0;
+    --text-light: #999;
+    --border: #3A3A4E;
+    --white: #1A1A2E;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+    --shadow-md: 0 8px 24px rgba(0,0,0,0.3);
+    --shadow-lg: 0 16px 48px rgba(0,0,0,0.4);
+    --header-bg: rgba(26, 26, 46, 0.97);
+    --input-bg: #2A2A3E;
+    --faq-question-bg: #6A7A30;
+    --faq-answer-bg: #2A2A3E;
+    --modal-overlay-bg: rgba(0,0,0,0.6);
+  }
 }
 
 /* ===== Utilities ===== */
@@ -129,7 +183,7 @@ img {
   top: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.97);
+  background: var(--header-bg);
   backdrop-filter: blur(12px);
   z-index: 1000;
   transition: box-shadow 0.3s;
@@ -1033,8 +1087,8 @@ img {
   align-items: center;
   padding: 16px 24px;
   cursor: pointer;
-  background: #8FA83A;
-  color: var(--white);
+  background: var(--faq-question-bg);
+  color: #fff;
   font-weight: 700;
   font-size: 0.95rem;
   user-select: none;
@@ -1082,7 +1136,7 @@ img {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.4s ease;
-  background: var(--white);
+  background: var(--faq-answer-bg);
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
@@ -1431,7 +1485,8 @@ img {
   border-radius: 8px;
   font-size: 0.95rem;
   transition: border-color 0.2s;
-  background: var(--white);
+  background: var(--input-bg);
+  color: var(--text);
 }
 
 .form-group input:focus {
@@ -1820,4 +1875,508 @@ img {
 
   .auth-card { padding: 32px 20px; }
   .social-login { flex-direction: column; }
+}
+
+/* ===== 1024px Tablet Breakpoint ===== */
+@media (max-width: 1024px) {
+  .testimonials-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .tips-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .point-item {
+    gap: 32px;
+  }
+
+  .footer-links-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-grid {
+    gap: 12px;
+  }
+
+  .summary-cards {
+    gap: 8px;
+  }
+
+  .steps-grid {
+    gap: 14px;
+  }
+
+  .step-card {
+    max-width: 200px;
+  }
+}
+
+/* ===== 480px Small Phone Breakpoint ===== */
+@media (max-width: 480px) {
+  body {
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+
+  .container {
+    padding: 0 16px;
+  }
+
+  .header-inner {
+    padding: 0 16px;
+  }
+
+  .logo {
+    font-size: 1.1rem;
+  }
+
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+
+  .hero {
+    padding: 32px 16px 28px;
+  }
+
+  .hero-logo-large .logo {
+    font-size: 1.5rem;
+    gap: 8px;
+  }
+
+  .hero-logo-large .logo-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 0.9rem;
+  }
+
+  .hero-tagline {
+    font-size: 0.95rem;
+  }
+
+  .hero-tagline-sub {
+    font-size: 0.82rem;
+    margin-bottom: 24px;
+  }
+
+  .hero-phone {
+    width: 160px;
+    height: 290px;
+    border-radius: 28px;
+  }
+
+  .hero-phone .phone-screen {
+    border-radius: 20px;
+  }
+
+  .speech-bubble.left {
+    left: 0;
+    top: -28px;
+    font-size: 0.7rem;
+    padding: 7px 12px;
+    border-radius: 14px;
+  }
+
+  .no1-badge {
+    right: -5px;
+    bottom: 5px;
+    width: 58px;
+    height: 58px;
+  }
+
+  .no1-badge .no1-small {
+    font-size: 0.4rem;
+  }
+
+  .no1-badge .no1-big {
+    font-size: 0.9rem;
+  }
+
+  .hero-cta-text {
+    font-size: 0.88rem;
+  }
+
+  .btn {
+    padding: 12px 28px;
+    font-size: 0.9rem;
+  }
+
+  .btn-lg {
+    padding: 14px 32px;
+    font-size: 1rem;
+  }
+
+  .section-label {
+    font-size: 0.78rem;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+    margin-bottom: 28px;
+  }
+
+  .section-title .big {
+    font-size: 2rem;
+  }
+
+  .weight-card {
+    padding: 20px 14px;
+  }
+
+  .weight-highlight .num {
+    font-size: 1.4rem;
+  }
+
+  .graph-bar {
+    width: 28px;
+  }
+
+  .weight-graph {
+    gap: 8px;
+    height: 120px;
+  }
+
+  .about-section {
+    padding: 56px 16px;
+  }
+
+  .about-circle {
+    width: 120px;
+    height: 120px;
+  }
+
+  .about-circle-icon {
+    font-size: 2rem;
+  }
+
+  .about-circle-text {
+    font-size: 0.75rem;
+  }
+
+  .about-number {
+    font-size: 2rem;
+  }
+
+  .features {
+    padding: 56px 16px;
+  }
+
+  .point-text h3 {
+    font-size: 1.15rem;
+  }
+
+  .point-text p {
+    font-size: 0.82rem;
+  }
+
+  .point-phone {
+    width: 150px;
+    height: 270px;
+    border-radius: 26px;
+  }
+
+  .steps-section {
+    padding: 56px 16px;
+  }
+
+  .step-num {
+    font-size: 2.8rem;
+  }
+
+  .step-card h3 {
+    font-size: 0.95rem;
+  }
+
+  .step-card p {
+    font-size: 0.78rem;
+  }
+
+  .step-phone-small {
+    width: 130px;
+    height: 230px;
+    border-radius: 22px;
+  }
+
+  .nutritionist-card {
+    padding: 28px 20px;
+  }
+
+  .nutritionist-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .testimonials {
+    padding: 56px 16px;
+  }
+
+  .testimonial-card {
+    padding: 18px;
+  }
+
+  .testimonials-count {
+    font-size: 1.1rem;
+  }
+
+  .testimonials-count .big-num {
+    font-size: 2.2rem;
+  }
+
+  .faq {
+    padding: 56px 16px;
+  }
+
+  .faq-question {
+    font-size: 0.85rem;
+    padding: 12px 16px;
+  }
+
+  .faq-answer-inner {
+    padding: 14px 16px;
+    font-size: 0.82rem;
+  }
+
+  .health-tips {
+    padding: 56px 16px;
+  }
+
+  .tip-tag {
+    padding: 6px 14px;
+    font-size: 0.75rem;
+  }
+
+  .tip-image {
+    height: 110px;
+    font-size: 2rem;
+  }
+
+  .tip-body h4 {
+    font-size: 0.78rem;
+  }
+
+  .cta {
+    padding: 56px 16px;
+  }
+
+  .cta h2 {
+    font-size: 1.3rem;
+  }
+
+  .cta p {
+    font-size: 0.85rem;
+  }
+
+  .footer-links-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .footer-legal-inner {
+    font-size: 0.65rem;
+  }
+
+  .auth-card {
+    padding: 24px 16px;
+  }
+
+  .auth-card .logo {
+    font-size: 1.3rem;
+  }
+
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .summary-card {
+    padding: 12px 6px;
+  }
+
+  .summary-card .value {
+    font-size: 1.1rem;
+  }
+
+  .dashboard {
+    padding: 16px;
+  }
+
+  .dashboard-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .card {
+    padding: 16px;
+  }
+}
+
+/* ===== Focus / Keyboard Navigation Styles ===== */
+*:focus-visible {
+  outline: 3px solid var(--green-light);
+  outline-offset: 2px;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--green-light);
+  outline-offset: 2px;
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--green-light);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(123, 139, 46, 0.2);
+}
+
+.faq-question:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+}
+
+.tip-tag:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+/* ===== Dark Mode Specific Overrides ===== */
+[data-theme="dark"] body,
+:root:not([data-theme="light"]) body {
+  color: var(--text);
+  background: var(--white);
+}
+
+[data-theme="dark"] .hero-phone,
+[data-theme="dark"] .point-phone,
+[data-theme="dark"] .step-phone-small {
+  background: #000;
+}
+
+[data-theme="dark"] .hero-phone .phone-screen,
+[data-theme="dark"] .point-phone .phone-screen,
+[data-theme="dark"] .step-phone-small .phone-screen {
+  background: #2A2A3E;
+}
+
+[data-theme="dark"] .screen-bar {
+  background: #3A3A4E;
+}
+
+[data-theme="dark"] .nutrition-bar {
+  background: #3A3A4E;
+}
+
+[data-theme="dark"] .meal-item {
+  border-bottom-color: #3A3A4E;
+}
+
+[data-theme="dark"] .btn-social {
+  background: var(--input-bg);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+[data-theme="dark"] .btn-social:hover {
+  background: #333350;
+}
+
+[data-theme="dark"] .btn-social svg path[fill="#333"] {
+  fill: #E0E0E0;
+}
+
+[data-theme="dark"] .screen-camera-area {
+  background: linear-gradient(135deg, #2A3020, #3A4030);
+}
+
+[data-theme="dark"] .hamburger span {
+  background: var(--text);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .hero-phone,
+  :root:not([data-theme="light"]) .point-phone,
+  :root:not([data-theme="light"]) .step-phone-small {
+    background: #000;
+  }
+
+  :root:not([data-theme="light"]) .hero-phone .phone-screen,
+  :root:not([data-theme="light"]) .point-phone .phone-screen,
+  :root:not([data-theme="light"]) .step-phone-small .phone-screen {
+    background: #2A2A3E;
+  }
+
+  :root:not([data-theme="light"]) .screen-bar {
+    background: #3A3A4E;
+  }
+
+  :root:not([data-theme="light"]) .nutrition-bar {
+    background: #3A3A4E;
+  }
+
+  :root:not([data-theme="light"]) .meal-item {
+    border-bottom-color: #3A3A4E;
+  }
+
+  :root:not([data-theme="light"]) .btn-social {
+    background: #2A2A3E;
+    border-color: #3A3A4E;
+    color: #E0E0E0;
+  }
+
+  :root:not([data-theme="light"]) .btn-social:hover {
+    background: #333350;
+  }
+
+  :root:not([data-theme="light"]) .btn-social svg path[fill="#333"] {
+    fill: #E0E0E0;
+  }
+
+  :root:not([data-theme="light"]) .screen-camera-area {
+    background: linear-gradient(135deg, #2A3020, #3A4030);
+  }
+
+  :root:not([data-theme="light"]) .hamburger span {
+    background: #E0E0E0;
+  }
+}
+
+/* ===== Skip Link (Accessibility) ===== */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--green-dark, #5A6B1E);
+  color: white;
+  padding: 8px 16px;
+  z-index: 10000;
+  transition: top 0.3s;
+  font-weight: 600;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* ===== Unified Toast (shared across all pages) ===== */
+.app-toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  padding: 12px 24px; border-radius: 8px; z-index: 9999;
+  font-size: 0.9rem; font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  animation: toastSlideIn 0.3s ease;
+  display: flex; align-items: center; gap: 8px;
+}
+.app-toast-success { background: var(--green-dark, #7B8B2E); color: white; }
+.app-toast-error { background: #e74c3c; color: white; }
+.app-toast-info { background: #3498db; color: white; }
+.toast-icon { font-weight: bold; }
+.toast-fade-out { opacity: 0; transition: opacity 0.3s; }
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }

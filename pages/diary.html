@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ダイアリー - BodyPilot</title>
+  <meta name="description" content="BodyPilotダイアリー - 毎日の体重・体脂肪・食事・運動を記録して健康管理。">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#7B8B2E">
+  <link rel="icon" type="image/svg+xml" href="../images/icon-192.svg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/diary.css">
+  <script>
+    (function() {
+      var saved = localStorage.getItem('bp_theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    })();
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">メインコンテンツにスキップ</a>
+
+  <!-- ヘッダー -->
+  <header class="app-header">
+    <a href="../index.html" class="app-logo">🍏 BodyPilot</a>
+    <div class="app-user-area">
+      <span id="user-name"></span>
+      <a href="settings.html" class="header-link">⚙️</a>
+      <button onclick="handleLogout()" class="logout-btn">ログアウト</button>
+    </div>
+  </header>
+
+  <!-- アプリ内ナビ -->
+  <nav class="app-nav">
+    <a href="meal.html" class="app-nav-item">食事記録</a>
+    <a href="diary.html" class="app-nav-item active">日記</a>
+    <a href="graph.html" class="app-nav-item">グラフ</a>
+    <a href="goals.html" class="app-nav-item">目標設定</a>
+    <a href="calculator.html" class="app-nav-item">簡単カロリー計算</a>
+  </nav>
+
+  <main class="diary-page" role="main" id="main-content">
+    <div class="diary-layout">
+      <!-- 左メインカラム -->
+      <div class="diary-main">
+        <!-- ダイアリーヘッダー -->
+        <div class="diary-header">
+          <h2><span id="diary-user-name"></span>さんのダイアリー</h2>
+        </div>
+
+        <!-- 今日のダイアリーを書くボタン -->
+        <button class="diary-write-btn" id="diary-write-btn" onclick="toggleDiaryPanel()">
+          今日のダイアリーを書く
+        </button>
+
+        <!-- 食事カルテセクション -->
+        <div class="diary-section" id="food-chart-section">
+          <div class="diary-section-header">
+            <h3>食事カルテ</h3>
+            <a href="meal.html" class="section-edit-link">編集する</a>
+          </div>
+
+          <!-- 日付表示 -->
+          <div class="diary-section-date" id="diary-date-display"></div>
+
+          <div class="diary-section-body">
+            <!-- 体重・摂取・カロリー比較テーブル -->
+            <table class="food-chart-table" id="food-chart-compare">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>目標</th>
+                  <th class="fc-arrow-col"></th>
+                  <th>本日</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="fc-label">体重</td>
+                  <td class="fc-goal" id="fc-weight-goal">-</td>
+                  <td class="fc-arrow">&rarr;</td>
+                  <td class="fc-actual" id="fc-weight-actual">-</td>
+                </tr>
+                <tr>
+                  <td class="fc-label">摂取カロリー</td>
+                  <td class="fc-goal" id="fc-cal-goal">-</td>
+                  <td class="fc-arrow">&rarr;</td>
+                  <td class="fc-actual" id="fc-cal-actual">-</td>
+                </tr>
+                <tr>
+                  <td class="fc-label">消費カロリー</td>
+                  <td class="fc-goal" id="fc-burn-goal">-</td>
+                  <td class="fc-arrow">&rarr;</td>
+                  <td class="fc-actual" id="fc-burn-actual">-</td>
+                </tr>
+                <tr>
+                  <td class="fc-label">タンパク質</td>
+                  <td class="fc-goal" id="fc-protein-goal">-</td>
+                  <td class="fc-arrow">&rarr;</td>
+                  <td class="fc-actual" id="fc-protein-actual">-</td>
+                </tr>
+                <tr>
+                  <td class="fc-label">脂質</td>
+                  <td class="fc-goal" id="fc-fat-goal">-</td>
+                  <td class="fc-arrow">&rarr;</td>
+                  <td class="fc-actual" id="fc-fat-actual">-</td>
+                </tr>
+                <tr>
+                  <td class="fc-label">炭水化物</td>
+                  <td class="fc-goal" id="fc-carb-goal">-</td>
+                  <td class="fc-arrow">&rarr;</td>
+                  <td class="fc-actual" id="fc-carb-actual">-</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- 概要テキスト -->
+            <div class="fc-summary" id="fc-summary"></div>
+          </div>
+        </div>
+
+        <!-- 1日の食事メニューセクション -->
+        <div class="diary-section" id="meal-menu-section">
+          <div class="diary-section-header">
+            <h3>1日の食事メニュー</h3>
+            <a href="meal.html" class="section-edit-link">編集する</a>
+          </div>
+          <div class="diary-section-body">
+            <div class="fc-meals">
+              <div class="fc-meal-group">
+                <div class="fc-meal-type">朝</div>
+                <div class="fc-meal-items" id="fc-breakfast">未記入</div>
+              </div>
+              <div class="fc-meal-group">
+                <div class="fc-meal-type">昼</div>
+                <div class="fc-meal-items" id="fc-lunch">未記入</div>
+              </div>
+              <div class="fc-meal-group">
+                <div class="fc-meal-type">夕</div>
+                <div class="fc-meal-items" id="fc-dinner">未記入</div>
+              </div>
+              <div class="fc-meal-group">
+                <div class="fc-meal-type">間</div>
+                <div class="fc-meal-items" id="fc-snack">未記入</div>
+              </div>
+              <div class="fc-total">
+                合計摂取カロリー: <strong id="fc-total-cal">0</strong> kcal
+              </div>
+            </div>
+
+            <!-- 栄養バランスタブ -->
+            <div class="fc-balance-tabs">
+              <button class="fc-tab active" onclick="switchFcTab('meal-balance')" id="fc-tab-meal">食事バランス</button>
+              <button class="fc-tab" onclick="switchFcTab('nutrition-balance')" id="fc-tab-nutrition">栄養バランス</button>
+            </div>
+            <div class="fc-balance-content" id="fc-balance-content">
+              <div id="fc-meal-balance" class="fc-tab-panel active">
+                <div class="nutrition-bars" id="fc-nutrition-bars"></div>
+              </div>
+              <div id="fc-nutrition-balance" class="fc-tab-panel">
+                <div class="nutrition-detail-bars" id="fc-nutrition-detail"></div>
+              </div>
+            </div>
+
+            <!-- 未完了メッセージ -->
+            <div class="fc-incomplete-msg" id="fc-incomplete-msg" style="display:none;">
+              食事カルテを全て入力後、診断します。
+            </div>
+          </div>
+        </div>
+
+        <!-- 運動量の充足率セクション -->
+        <div class="diary-section" id="exercise-rate-section">
+          <div class="diary-section-header">
+            <h3>運動量の充足率</h3>
+            <a href="dashboard.html" class="section-edit-link">編集する</a>
+          </div>
+          <div class="diary-section-body">
+            <div id="exercise-rate-content">
+              <a href="dashboard.html" class="exercise-unrecorded">未記入 - 運動を記録する</a>
+            </div>
+            <div class="exercise-rate-summary" id="exercise-rate-summary"></div>
+          </div>
+        </div>
+
+        <!-- ダイアリーフォームセクション -->
+        <div class="diary-section diary-form-section" id="diary-form-section">
+          <div class="diary-section-header diary-form-header">
+            <h3>ダイアリー</h3>
+          </div>
+          <div class="diary-section-body">
+            <form id="diary-form" onsubmit="event.preventDefault(); submitDiary();">
+              <div class="diary-form-row">
+                <div class="diary-form-field">
+                  <label for="diary-weight">体重</label>
+                  <div class="diary-input-unit">
+                    <input type="number" id="diary-weight" step="0.1" min="20" max="300" placeholder="--.-">
+                    <span class="unit">kg</span>
+                  </div>
+                </div>
+                <div class="diary-form-field">
+                  <label for="diary-bodyfat">体脂肪</label>
+                  <div class="diary-input-unit">
+                    <input type="number" id="diary-bodyfat" step="0.1" min="1" max="60" placeholder="--.-">
+                    <span class="unit">%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="diary-form-row">
+                <div class="diary-form-field">
+                  <label id="bowel-label">お通じ</label>
+                  <div class="diary-radio-group" role="radiogroup" aria-labelledby="bowel-label">
+                    <label class="diary-radio">
+                      <input type="radio" name="bowel" value="あり">
+                      <span>あり</span>
+                    </label>
+                    <label class="diary-radio">
+                      <input type="radio" name="bowel" value="なし">
+                      <span>なし</span>
+                    </label>
+                  </div>
+                  <p class="bowel-note">※お通じはダイアリーを全体公開にしても他の人には見えません</p>
+                </div>
+                <div class="diary-form-field">
+                  <label for="diary-eval">自己評価</label>
+                  <select id="diary-eval" class="diary-select">
+                    <option value="">設定しない</option>
+                    <option value="1">☆1</option>
+                    <option value="2">☆2</option>
+                    <option value="3">☆3</option>
+                    <option value="4">☆4</option>
+                    <option value="5">☆5</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="diary-form-field diary-text-field">
+                <label for="diary-text">本文 <span class="text-count">(<span id="diary-text-count">0</span>/500文字)</span></label>
+                <textarea id="diary-text" maxlength="500" rows="5" placeholder="今日の感想や反省点を書きましょう..."></textarea>
+              </div>
+
+              <div class="diary-form-actions">
+                <button type="submit" class="diary-submit-btn">更新</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右サイドバー -->
+      <aside class="diary-sidebar">
+        <div class="monthly-table-wrapper">
+          <div class="monthly-table-header">
+            <button class="month-nav-btn" id="month-prev" onclick="changeMonth(-1)" aria-label="前月">&larr;</button>
+            <span class="month-title" id="month-title"></span>
+            <button class="month-nav-btn" id="month-next" onclick="changeMonth(1)" aria-label="翌月">&rarr;</button>
+          </div>
+          <table class="monthly-table" id="monthly-table">
+            <thead>
+              <tr>
+                <th>日付</th>
+                <th>体重</th>
+                <th class="col-bodyfat">体脂肪</th>
+                <th class="col-health">健康度</th>
+                <th>ダイアリー</th>
+              </tr>
+            </thead>
+            <tbody id="monthly-table-body">
+            </tbody>
+          </table>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- トースト通知コンテナ -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/food-db.js"></script>
+  <script src="../js/store.js"></script>
+  <script src="../js/advisor.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/diary.js"></script>
+  <script>
+  function handleLogout() {
+    Auth.logout();
+  }
+  // Set header user name
+  document.addEventListener('DOMContentLoaded', function() {
+    var nameEl = document.getElementById('user-name');
+    if (nameEl && Auth.currentUser) {
+      nameEl.textContent = Auth.currentUser.name || Auth.currentUser.email;
+    }
+  });
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('../sw.js');
+  }
+  </script>
+</body>
+</html>

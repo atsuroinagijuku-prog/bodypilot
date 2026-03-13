@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>簡単カロリー・栄養素計算 - BodyPilot</title>
+  <meta name="description" content="食品のカロリー・栄養素を簡単に計算。フリーワード検索やカテゴリーから食品を探して、栄養バランスをチェック。">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#7B8B2E">
+  <link rel="icon" type="image/svg+xml" href="../images/icon-192.svg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/app.css">
+  <script>
+    (function() {
+      var saved = localStorage.getItem('bp_theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    })();
+  </script>
+  <style>
+    .calc-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 100px 20px 60px;
+    }
+    .calc-title {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .calc-title h1 {
+      font-size: 1.6rem;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .calc-title .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+    .help-toggle {
+      display: inline-block;
+      margin: 16px auto;
+      padding: 8px 20px;
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid var(--green);
+      border-radius: var(--radius-pill);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .help-toggle:hover {
+      background: var(--green);
+      color: #fff;
+    }
+    .calc-section {
+      margin-top: 32px;
+    }
+    .calc-section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 12px;
+      padding-left: 12px;
+      border-left: 4px solid var(--green);
+    }
+    .search-box {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .search-box input {
+      flex: 1;
+      padding: 14px 16px;
+      font-size: 1rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--input-bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-box input:focus {
+      border-color: var(--green);
+    }
+    .search-box .btn-search {
+      padding: 14px 28px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .search-box .btn-search:hover {
+      background: var(--green-light);
+    }
+    .search-help-text {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-bottom: 8px;
+    }
+    #category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+    }
+    .category-card {
+      padding: 14px 8px;
+      background: var(--white);
+      border: 2px solid var(--green-pale);
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--green);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .category-card:hover,
+    .category-card.active {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+    }
+    #calc-results {
+      margin-top: 24px;
+    }
+    .calc-result-item {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .calc-result-item:hover {
+      box-shadow: var(--shadow-sm);
+    }
+    .calc-result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      cursor: pointer;
+    }
+    .food-name {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    .food-cal {
+      font-size: 0.85rem;
+      color: var(--green);
+      font-weight: 700;
+      white-space: nowrap;
+      margin-left: 12px;
+    }
+    .calc-result-detail {
+      padding: 0 16px 16px;
+      border-top: 1px solid var(--border);
+    }
+    .nutrition-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 12px 0;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+    .portion-calc {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 8px 0;
+    }
+    .portion-calc label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .portion-input {
+      width: 80px;
+      padding: 8px 10px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      text-align: center;
+      background: var(--input-bg);
+      color: var(--text);
+      outline: none;
+    }
+    .portion-input:focus {
+      border-color: var(--green);
+    }
+    .calc-preview {
+      font-size: 0.9rem;
+      color: var(--green);
+      font-weight: 700;
+      margin-left: 4px;
+    }
+    .btn-add-record {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 20px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-add-record:hover {
+      background: var(--green-light);
+    }
+    .no-results {
+      text-align: center;
+      color: var(--text-light);
+      padding: 40px 0;
+      font-size: 0.9rem;
+    }
+    /* Help Modal */
+    .help-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--modal-overlay-bg);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .help-modal-content {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      max-width: 500px;
+      width: 100%;
+      position: relative;
+      box-shadow: var(--shadow-lg);
+    }
+    .help-modal-content h3 {
+      font-size: 1.1rem;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+    .help-modal-content p {
+      font-size: 0.9rem;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+      line-height: 1.7;
+    }
+    .help-modal-content strong {
+      color: var(--green);
+    }
+    .help-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-light);
+    }
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--green);
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: var(--radius-pill);
+      font-size: 0.9rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 9999;
+      pointer-events: none;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    @media (max-width: 600px) {
+      .calc-container {
+        padding: 80px 12px 40px;
+      }
+      .calc-title h1 {
+        font-size: 1.3rem;
+      }
+      #category-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .nutrition-grid {
+        grid-template-columns: 1fr;
+      }
+      .search-box input {
+        padding: 12px 14px;
+      }
+      .search-box .btn-search {
+        padding: 12px 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">メインコンテンツにスキップ</a>
+  <!-- ヘッダー -->
+  <header class="app-header">
+    <a href="../index.html" class="app-logo">🍏 BodyPilot</a>
+    <div class="app-user-area">
+      <span id="user-name"></span>
+      <a href="register.html" class="header-link" id="nav-register">新規登録</a>
+      <a href="login.html" class="header-link" id="nav-login">ログイン</a>
+      <a href="settings.html" class="header-link" id="nav-settings" style="display:none;">⚙️</a>
+      <button onclick="handleLogout()" class="logout-btn" id="nav-logout" style="display:none;">ログアウト</button>
+    </div>
+  </header>
+
+  <!-- アプリ内ナビ -->
+  <nav class="app-nav">
+    <a href="meal.html" class="app-nav-item">食事記録</a>
+    <a href="diary.html" class="app-nav-item">日記</a>
+    <a href="graph.html" class="app-nav-item">グラフ</a>
+    <a href="goals.html" class="app-nav-item">目標設定</a>
+    <a href="calculator.html" class="app-nav-item active">簡単カロリー計算</a>
+  </nav>
+
+  <div class="calc-container" role="main" id="main-content">
+    <!-- Title -->
+    <div class="calc-title">
+      <h1>簡単カロリー・栄養素計算</h1>
+      <p class="subtitle">Calorie and Nutrient Calculator</p>
+    </div>
+
+    <div style="text-align:center;">
+      <button class="help-toggle" onclick="toggleHelp()">使い方を見る</button>
+    </div>
+
+    <!-- Search Section -->
+    <div class="calc-section">
+      <div class="calc-section-title">フリーワード検索</div>
+      <div class="search-box">
+        <input type="text" id="calc-search-input" placeholder="メニューを検索" onkeydown="if(event.key==='Enter'){searchFood();}">
+        <button class="btn-search" onclick="searchFood()">検索</button>
+      </div>
+      <p class="search-help-text">「さんま しおやき」のように、ひらがなで入力してみてください。</p>
+    </div>
+
+    <!-- Category Section -->
+    <div class="calc-section">
+      <div class="calc-section-title">料理カテゴリーから選ぶ</div>
+      <div id="category-grid"></div>
+    </div>
+
+    <!-- Results -->
+    <div id="calc-results"></div>
+  </div>
+
+  <!-- Help Modal -->
+  <div class="help-modal-overlay" id="help-modal" onclick="if(event.target===this)toggleHelp()">
+    <div class="help-modal-content">
+      <button class="help-close" onclick="toggleHelp()">&times;</button>
+      <h3>使い方</h3>
+      <p>2つの検索方法があります。</p>
+      <p><strong>1. フリーワードで検索</strong><br>
+        上の検索ボックスに食品名をひらがなで入力して「検索」ボタンを押してください。ローマ字入力にも対応しています。</p>
+      <p><strong>2. 料理カテゴリーから選ぶ</strong><br>
+        「ごはん」「めん」「肉」などのカテゴリーボタンをタップすると、そのカテゴリーの食品一覧が表示されます。</p>
+      <p>食品をタップすると、栄養素の詳細と分量を調整して計算できます。ログイン中は「記録に追加」で今日の食事に追加できます。</p>
+    </div>
+  </div>
+
+  <!-- トースト通知コンテナ -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/food-db.js"></script>
+  <script src="../js/store.js"></script>
+  <script src="../js/calculator.js"></script>
+  <script>
+  // Require login
+  Auth.init();
+  if (!Auth.isLoggedIn()) {
+    window.location.href = 'login.html';
+  }
+  </script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('../sw.js');
+  }
+  </script>
+</body>
+</html>

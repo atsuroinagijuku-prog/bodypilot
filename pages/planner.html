@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>食事プランナー - BodyPilot</title>
+  <meta name="description" content="BodyPilot食事プランナー - 週間の献立を計画し、買い物リストを自動生成。">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#7B8B2E">
+  <link rel="icon" type="image/svg+xml" href="../images/icon-192.svg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <script>
+    (function() {
+      var saved = localStorage.getItem('bp_theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    })();
+  </script>
+  <style>
+    /* ===== Planner Styles ===== */
+    .planner-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    .planner-main h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    /* Week Navigation */
+    .week-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .week-nav button {
+      background: var(--green-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px 16px;
+      font-size: 1rem;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+
+    .week-nav button:hover {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+    }
+
+    #week-display {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+      min-width: 180px;
+      text-align: center;
+    }
+
+    .btn {
+      padding: 8px 20px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-sm {
+      padding: 6px 14px;
+      font-size: 0.82rem;
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--green-light);
+    }
+
+    .btn-secondary {
+      background: var(--green-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    /* Planner Actions */
+    .planner-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* 7-Day Grid */
+    .planner-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      min-width: 0;
+    }
+
+    .planner-day {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px;
+      min-width: 140px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: box-shadow 0.2s;
+    }
+
+    .planner-day:hover {
+      box-shadow: var(--shadow-sm);
+    }
+
+    .planner-day-today {
+      border-color: var(--green);
+      border-width: 2px;
+      box-shadow: 0 0 0 1px var(--green-bg);
+    }
+
+    .day-header {
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .day-date {
+      font-size: 0.78rem;
+      color: var(--text-sub);
+      font-weight: 400;
+    }
+
+    /* Meal Slots */
+    .meal-slot {
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 6px;
+      min-height: 50px;
+    }
+
+    .slot-label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .slot-items {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .slot-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--green-bg);
+      border-radius: 6px;
+      padding: 3px 6px;
+      font-size: 0.72rem;
+    }
+
+    .slot-item-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--text);
+    }
+
+    .slot-item-cal {
+      color: var(--text-sub);
+      font-size: 0.68rem;
+      white-space: nowrap;
+    }
+
+    .slot-item-remove {
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0 2px;
+      line-height: 1;
+    }
+
+    .slot-item-remove:hover {
+      color: #e53935;
+    }
+
+    .add-plan-btn {
+      display: block;
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--green);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 2px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .add-plan-btn:hover {
+      background: var(--green-bg);
+    }
+
+    /* Day Totals */
+    .day-totals {
+      text-align: center;
+      padding-top: 4px;
+      border-top: 1px solid var(--border);
+    }
+
+    .day-cal {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    /* Weekly Summary */
+    .weekly-summary {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+
+    .weekly-summary h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .summary-row span:last-child {
+      font-weight: 600;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-content {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .modal-content h2 {
+      font-size: 1.2rem;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-sub);
+      line-height: 1;
+    }
+
+    .modal-close:hover {
+      color: var(--text);
+    }
+
+    /* Food Search in Modal */
+    #plan-food-search {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      background: var(--input-bg, #fff);
+      color: var(--text);
+    }
+
+    #plan-food-search:focus {
+      outline: none;
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px var(--green-bg);
+    }
+
+    #plan-food-results {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .plan-food-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+      gap: 8px;
+    }
+
+    .plan-food-item:hover {
+      background: var(--green-bg);
+    }
+
+    .plan-food-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .plan-food-info {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      white-space: nowrap;
+    }
+
+    /* Shopping List */
+    #shopping-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 16px;
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+
+    .shopping-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .shopping-item:hover {
+      background: var(--green-bg);
+    }
+
+    .shopping-check {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--green);
+      flex-shrink: 0;
+    }
+
+    .shopping-check:checked + .shopping-name {
+      text-decoration: line-through;
+      color: var(--text-sub);
+    }
+
+    .shopping-name {
+      flex: 1;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .shopping-qty {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      white-space: nowrap;
+    }
+
+    .shopping-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 1024px) {
+      .planner-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .planner-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .planner-main {
+        padding: 16px 10px 60px;
+      }
+
+      .week-nav {
+        justify-content: center;
+      }
+
+      .planner-actions {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .planner-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .planner-day {
+        min-width: 0;
+      }
+    }
+
+    /* ===== Dark Mode ===== */
+    [data-theme="dark"] .planner-day {
+      background: var(--card-bg, #1e1e1e);
+      border-color: var(--border);
+    }
+
+    [data-theme="dark"] .modal-content {
+      background: var(--card-bg, #1e1e1e);
+    }
+
+    [data-theme="dark"] .weekly-summary {
+      background: var(--card-bg, #1e1e1e);
+    }
+
+    [data-theme="dark"] .slot-item {
+      background: rgba(123, 139, 46, 0.15);
+    }
+
+    [data-theme="dark"] .plan-food-item:hover,
+    [data-theme="dark"] .shopping-item:hover {
+      background: rgba(123, 139, 46, 0.15);
+    }
+
+    [data-theme="dark"] #plan-food-search {
+      background: var(--input-bg, #2a2a2a);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    /* ===== Print ===== */
+    @media print {
+      .header, .week-nav, .planner-actions, .add-plan-btn, .slot-item-remove, .modal-overlay {
+        display: none !important;
+      }
+      .planner-grid {
+        grid-template-columns: repeat(7, 1fr) !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">メインコンテンツにスキップ</a>
+  <!-- ヘッダー -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="dashboard.html" class="logo" aria-label="BodyPilot ダッシュボード">
+        <span class="logo-icon">B</span>
+        Body<span class="logo-accent">Pilot</span>
+      </a>
+      <nav class="nav" role="navigation" aria-label="プランナーナビゲーション">
+        <a href="dashboard.html">ダッシュボード</a>
+        <a href="planner.html" style="color:var(--green); font-weight:700;">プランナー</a>
+        <a href="reports.html">レポート</a>
+        <a href="settings.html">設定</a>
+        <a href="#" onclick="handleLogout(); return false;">ログアウト</a>
+      </nav>
+      <button class="hamburger" id="hamburger" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="planner-main" role="main" id="main-content">
+    <h2>週間食事プラン</h2>
+
+    <!-- Week navigation -->
+    <div class="week-nav">
+      <button onclick="prevWeek()" aria-label="前の週">&#8592;</button>
+      <span id="week-display">-</span>
+      <button onclick="nextWeek()" aria-label="次の週">&#8594;</button>
+      <button onclick="thisWeek()" class="btn btn-sm">今週</button>
+    </div>
+
+    <!-- Auto-generate button -->
+    <div class="planner-actions">
+      <button onclick="autoGeneratePlan()" class="btn btn-primary">自動で献立を作成</button>
+      <button onclick="clearWeekPlan()" class="btn btn-secondary">クリア</button>
+      <button onclick="generateShoppingList()" class="btn btn-secondary">&#128722; 買い物リスト作成</button>
+    </div>
+
+    <!-- 7-day grid (generated by JS) -->
+    <div class="planner-grid" id="planner-grid"></div>
+
+    <!-- Weekly nutrition summary -->
+    <div class="weekly-summary" id="weekly-summary">
+      <h3>週間栄養サマリー</h3>
+      <div class="summary-row">
+        <span>平均カロリー:</span><span><span id="avg-cal">0</span> kcal</span>
+      </div>
+      <div class="summary-row">
+        <span>平均タンパク質:</span><span><span id="avg-protein">0</span> g</span>
+      </div>
+    </div>
+
+    <!-- Food picker modal for planner -->
+    <div class="modal-overlay" id="plan-food-modal" style="display:none">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closePlanFoodModal()" aria-label="閉じる">&times;</button>
+        <h2>食品を追加</h2>
+        <input type="text" id="plan-food-search" placeholder="食品を検索..." oninput="searchPlanFood(this.value)">
+        <div id="plan-food-results"></div>
+      </div>
+    </div>
+
+    <!-- Shopping list modal -->
+    <div class="modal-overlay" id="shopping-modal" style="display:none">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeShoppingModal()" aria-label="閉じる">&times;</button>
+        <h2>&#128722; 買い物リスト</h2>
+        <div id="shopping-list"></div>
+        <div class="shopping-actions">
+          <button onclick="copyShoppingList()" class="btn btn-secondary">&#128203; コピー</button>
+          <button onclick="printShoppingList()" class="btn btn-secondary">&#128424; 印刷</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/food-db.js"></script>
+  <script src="../js/store.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/planner.js"></script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('../sw.js');
+  }
+  </script>
+</body>
+</html>

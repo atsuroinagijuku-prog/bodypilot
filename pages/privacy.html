@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>プライバシーポリシー - BodyPilot</title>
+  <meta name="description" content="BodyPilotプライバシーポリシー - 個人情報の取り扱いについてご確認ください。">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#7B8B2E">
+  <link rel="icon" type="image/svg+xml" href="../images/icon-192.svg">
+  <link rel="stylesheet" href="../css/style.css">
+  <script>
+    (function() {
+      var saved = localStorage.getItem('bp_theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+  <style>
+    .legal-page { max-width: 800px; margin: 0 auto; padding: 40px 20px 80px; }
+    .legal-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
+    .legal-header .back-link { color: var(--green); text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+    .legal-header .back-link:hover { text-decoration: underline; }
+    .legal-page h1 { font-size: 1.6rem; margin-bottom: 8px; color: var(--text); font-weight: 800; }
+    .legal-updated { font-size: 0.82rem; color: var(--text-sub); margin-bottom: 32px; }
+    .legal-toc { background: var(--cream); border-radius: 12px; padding: 20px 24px; margin-bottom: 36px; }
+    .legal-toc h2 { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+    .legal-toc ol { padding-left: 20px; margin: 0; }
+    .legal-toc li { margin-bottom: 6px; }
+    .legal-toc a { color: var(--green); text-decoration: none; font-size: 0.85rem; line-height: 1.6; }
+    .legal-toc a:hover { text-decoration: underline; }
+    .legal-section { margin-bottom: 32px; }
+    .legal-section h2 { font-size: 1.15rem; font-weight: 700; color: var(--text); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--green-pale); }
+    .legal-section p, .legal-section li { line-height: 1.9; color: var(--text-sub); font-size: 0.9rem; margin-bottom: 10px; }
+    .legal-section ul { padding-left: 20px; margin-bottom: 12px; }
+    .legal-section ul li { margin-bottom: 6px; }
+    .legal-footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center; }
+    .legal-footer a { color: var(--green); text-decoration: none; font-weight: 600; }
+    .legal-footer a:hover { text-decoration: underline; }
+    [data-theme="dark"] .legal-toc { background: var(--card-bg, #1e1e1e); }
+  </style>
+</head>
+<body>
+  <div class="legal-page">
+    <div class="legal-header">
+      <a href="../index.html" class="back-link">&larr; トップページに戻る</a>
+    </div>
+    <div class="logo" style="margin-bottom: 24px;">
+      <span class="logo-icon">B</span>
+      Body<span class="logo-accent">Pilot</span>
+    </div>
+    <h1>プライバシーポリシー</h1>
+    <p class="legal-updated">最終更新日: 2026年3月13日</p>
+
+    <nav class="legal-toc">
+      <h2>目次</h2>
+      <ol>
+        <li><a href="#collected-info">収集する情報</a></li>
+        <li><a href="#purpose">情報の利用目的</a></li>
+        <li><a href="#storage">データの保存</a></li>
+        <li><a href="#cookies">Cookie</a></li>
+        <li><a href="#third-party">第三者提供</a></li>
+        <li><a href="#user-rights">ユーザーの権利</a></li>
+        <li><a href="#contact">問い合わせ先</a></li>
+      </ol>
+    </nav>
+
+    <p style="line-height:1.9; color:var(--text-sub); font-size:0.9rem; margin-bottom:24px;">BodyPilot（以下「当サービス」）は、ユーザーの皆様の個人情報の保護を重要と考え、個人情報の保護に関する法律（個人情報保護法）およびEU一般データ保護規則（GDPR）の趣旨に基づき、適切な取り扱いに努めます。本プライバシーポリシーでは、当サービスにおけるデータの取り扱いについて説明します。</p>
+
+    <section class="legal-section" id="collected-info">
+      <h2>第1条 収集する情報</h2>
+      <p>当サービスでは、以下の情報を取り扱います。すべての情報はお使いのブラウザ内（localStorage）に保存され、原則として外部サーバーに送信されることはありません。</p>
+      <ul>
+        <li><strong>アカウント情報:</strong> ユーザー名、メールアドレス、パスワード（ハッシュ化して保存）</li>
+        <li><strong>食事記録:</strong> 食品名、カロリー、栄養素（タンパク質、脂質、炭水化物、食物繊維）、食事タイプ、記録日時</li>
+        <li><strong>体重データ:</strong> 体重、体脂肪率、記録日</li>
+        <li><strong>健康目標:</strong> 目標カロリー、目標栄養素量</li>
+        <li><strong>運動記録:</strong> 運動種類、時間、消費カロリー</li>
+        <li><strong>水分摂取記録:</strong> 水分摂取量、記録日</li>
+        <li><strong>食事写真:</strong> カメラで撮影した写真データ（Base64形式でlocalStorageに保存）</li>
+        <li><strong>設定情報:</strong> テーマ設定、言語設定、API設定</li>
+      </ul>
+    </section>
+
+    <section class="legal-section" id="purpose">
+      <h2>第2条 情報の利用目的</h2>
+      <p>収集した情報は、以下の目的でのみ利用されます。</p>
+      <ul>
+        <li>食事記録の表示・管理・分析</li>
+        <li>カロリー・栄養素バランスの計算と表示</li>
+        <li>健康スコアの算出とアドバイスの生成</li>
+        <li>体重推移グラフの表示</li>
+        <li>レポート（週間・月間）の生成</li>
+        <li>ユーザーの目標に基づいた栄養アドバイスの提供</li>
+        <li>ゲーミフィケーション機能（バッジ、レベル、チャレンジ）の運用</li>
+      </ul>
+    </section>
+
+    <section class="legal-section" id="storage">
+      <h2>第3条 データの保存</h2>
+      <p>当サービスはクライアントサイドで動作するウェブアプリケーションです。データの保存について以下の通りご説明します。</p>
+      <ul>
+        <li><strong>保存場所:</strong> すべてのユーザーデータは、お使いのブラウザのlocalStorageに保存されます。外部データベースやクラウドサーバーへの保存は行いません。</li>
+        <li><strong>サーバーサイド処理:</strong> 当サービスでは基本的にサーバーサイドでのデータ処理を行いません。すべての計算・分析はブラウザ上で実行されます。</li>
+        <li><strong>データの永続性:</strong> localStorageに保存されたデータは、ブラウザのデータ消去、キャッシュクリア、端末の変更により失われる可能性があります。重要なデータは定期的にエクスポート機能をご利用ください。</li>
+        <li><strong>ストレージ容量:</strong> ブラウザのlocalStorageには通常5〜10MBの容量制限があります。容量が不足した場合はアプリ内で警告が表示されます。</li>
+        <li><strong>OpenAI API利用時:</strong> OpenAI APIキーを設定して写真分析機能を利用する場合、食事写真のデータがOpenAIのサーバーに送信されます。この場合、OpenAIのプライバシーポリシーが適用されます。APIキーはlocalStorageに保存されます。</li>
+      </ul>
+    </section>
+
+    <section class="legal-section" id="cookies">
+      <h2>第4条 Cookie</h2>
+      <p>当サービスではCookieを使用していません。ユーザー設定やセッション情報の保存にはlocalStorageを使用しています。</p>
+      <p>ただし、当サービスがサードパーティのCDN（Content Delivery Network）から外部ライブラリ（Chart.js、QuaggaJS等）を読み込む際に、CDNプロバイダーがCookieを設定する場合があります。これらのCookieは当サービスの管理下にはなく、各プロバイダーのプライバシーポリシーが適用されます。</p>
+    </section>
+
+    <section class="legal-section" id="third-party">
+      <h2>第5条 第三者提供</h2>
+      <p>当サービスは、ユーザーの個人情報を第三者に提供・開示・売却することはありません。</p>
+      <p>ただし、以下の場合にデータが第三者のサービスに送信される可能性があります。</p>
+      <ul>
+        <li><strong>OpenAI API:</strong> ユーザーが任意でAPIキーを設定し、写真分析機能を利用する場合。送信されるのは食事写真データのみであり、アカウント情報や食事記録は送信されません。</li>
+        <li><strong>Firebase（オプション）:</strong> 将来的にFirebaseを利用したクラウド同期機能が導入された場合、Googleのプライバシーポリシーおよびデータ処理契約に基づきデータが処理されます。この機能はユーザーの明示的な同意のもとでのみ有効化されます。</li>
+      </ul>
+    </section>
+
+    <section class="legal-section" id="user-rights">
+      <h2>第6条 ユーザーの権利</h2>
+      <p>個人情報保護法およびGDPRに基づき、ユーザーは以下の権利を有します。</p>
+      <ul>
+        <li><strong>アクセス権:</strong> ご自身のデータにいつでもアクセスできます。設定ページからデータをJSON形式でエクスポートすることが可能です。</li>
+        <li><strong>訂正権:</strong> 設定ページからプロフィール情報や目標を随時修正できます。食事記録も編集・削除が可能です。</li>
+        <li><strong>削除権（忘れられる権利）:</strong> 設定ページの「アカウント削除」機能により、すべてのデータを完全に削除できます。localStorageから即座にデータが消去されます。</li>
+        <li><strong>データポータビリティ:</strong> エクスポート機能を利用して、ご自身のデータを機械可読な形式（JSON）で取得できます。</li>
+        <li><strong>処理の制限:</strong> 当サービスはクライアントサイドで動作するため、データの処理はすべてユーザーのブラウザ上で行われ、ユーザー自身が完全に制御できます。</li>
+      </ul>
+    </section>
+
+    <section class="legal-section" id="contact">
+      <h2>第7条 問い合わせ先</h2>
+      <p>本プライバシーポリシーに関するお問い合わせ、またはデータの取り扱いに関するご質問は、以下の連絡先までお願いいたします。</p>
+      <p>サービス名: BodyPilot<br>
+      メール: privacy@bodypilot.app</p>
+      <p>本ポリシーは、法令の変更やサービスの改善に伴い、予告なく改定される場合があります。重大な変更がある場合は、当サービス上でお知らせいたします。</p>
+    </section>
+
+    <div class="legal-footer">
+      <a href="../index.html">&larr; トップページに戻る</a>
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      <a href="terms.html">利用規約</a>
+    </div>
+  </div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/main.js" defer></script>
+</body>
+</html>

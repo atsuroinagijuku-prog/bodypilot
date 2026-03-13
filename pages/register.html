@@ -3,121 +3,1063 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>新規登録 - BodyPilot</title>
+  <title>新規会員登録 - BodyPilot</title>
+  <meta name="description" content="BodyPilot無料会員登録。ユーザー情報を登録して、食事管理を始めましょう。">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#7B8B2E">
+  <link rel="icon" type="image/svg+xml" href="../images/icon-192.svg">
   <link rel="stylesheet" href="../css/style.css">
+  <script>
+    (function() {
+      var saved = localStorage.getItem('bp_theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+  <style>
+    /* Registration Wizard Styles */
+    .reg-page {
+      min-height: 100vh;
+      background: var(--cream, #FBF9F3);
+      padding: 0;
+    }
+    .reg-header {
+      background: #fff;
+      border-bottom: 1px solid var(--border, #E8E4D9);
+      padding: 16px 24px;
+    }
+    .reg-header h1 {
+      font-size: 1.1rem;
+      color: var(--text, #3A3A3A);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* Step Progress Bar */
+    .step-bar {
+      display: flex;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0;
+      background: #fff;
+    }
+    .step-item {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      font-size: 0.82rem;
+      color: #999;
+      background: #f0f0f0;
+      position: relative;
+      white-space: nowrap;
+      gap: 6px;
+    }
+    .step-item .step-label {
+      font-weight: 700;
+      color: inherit;
+    }
+    .step-item .step-text {
+      color: inherit;
+    }
+    .step-item.active {
+      background: var(--green, #7B8B2E);
+      color: #fff;
+    }
+    .step-item.done {
+      background: var(--green-bg, #F0F4E0);
+      color: var(--green, #7B8B2E);
+    }
+    .step-item + .step-item::before {
+      content: '';
+      position: absolute;
+      left: -8px;
+      top: 0;
+      bottom: 0;
+      width: 0;
+      height: 0;
+      border-top: 22px solid transparent;
+      border-bottom: 22px solid transparent;
+      border-left: 8px solid #fff;
+      z-index: 1;
+    }
+
+    /* Main Content Area */
+    .reg-main {
+      max-width: 800px;
+      margin: 24px auto;
+      padding: 0 24px;
+    }
+    .reg-card {
+      background: #fff;
+      border: 1px solid var(--border, #E8E4D9);
+      border-radius: 4px;
+      padding: 32px;
+    }
+    .reg-welcome {
+      margin-bottom: 24px;
+    }
+    .reg-welcome h2 {
+      font-size: 1.2rem;
+      color: var(--text, #3A3A3A);
+      margin-bottom: 8px;
+    }
+    .reg-welcome p {
+      font-size: 0.85rem;
+      color: var(--text-sub, #5A5A5A);
+      line-height: 1.6;
+    }
+    .reg-welcome .required-note {
+      font-size: 0.8rem;
+      color: #C33;
+      margin-top: 4px;
+    }
+
+    /* Form Table Layout (like あすけん) */
+    .reg-form-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .reg-form-table tr {
+      border-bottom: 1px solid #eee;
+    }
+    .reg-form-table tr:last-child {
+      border-bottom: none;
+    }
+    .reg-form-table th {
+      text-align: left;
+      padding: 16px 16px 16px 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text, #3A3A3A);
+      vertical-align: top;
+      width: 160px;
+      white-space: nowrap;
+    }
+    .reg-form-table th .req {
+      color: #C33;
+      font-size: 0.75rem;
+      margin-left: 2px;
+    }
+    .reg-form-table td {
+      padding: 12px 0;
+      font-size: 0.88rem;
+    }
+    .reg-form-table input[type="text"],
+    .reg-form-table input[type="email"],
+    .reg-form-table input[type="password"],
+    .reg-form-table input[type="number"],
+    .reg-form-table select {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      background: #fff;
+      color: var(--text, #3A3A3A);
+    }
+    .reg-form-table input:focus,
+    .reg-form-table select:focus {
+      outline: none;
+      border-color: var(--green, #7B8B2E);
+      box-shadow: 0 0 0 2px rgba(123, 139, 46, 0.15);
+    }
+    .reg-form-table input[type="text"],
+    .reg-form-table input[type="email"],
+    .reg-form-table input[type="password"] {
+      width: 260px;
+      max-width: 100%;
+    }
+    .reg-form-table input[type="number"] {
+      width: 80px;
+    }
+    .field-hint {
+      font-size: 0.75rem;
+      color: #999;
+      margin-left: 8px;
+    }
+    .field-note {
+      font-size: 0.75rem;
+      color: #999;
+      display: block;
+      margin-top: 4px;
+    }
+    .field-error {
+      font-size: 0.75rem;
+      color: #C33;
+      display: block;
+      margin-top: 4px;
+    }
+
+    /* Radio group */
+    .radio-group {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      font-size: 0.88rem;
+    }
+    .radio-group input[type="radio"] {
+      accent-color: var(--green, #7B8B2E);
+    }
+
+    /* Birthday selects */
+    .birthday-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .birthday-group select {
+      padding: 8px 6px;
+      min-width: 80px;
+    }
+    .birthday-group span {
+      font-size: 0.88rem;
+    }
+
+    /* Checkbox for mail */
+    .mail-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .mail-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .mail-group input[type="radio"] {
+      accent-color: var(--green, #7B8B2E);
+    }
+
+    /* Agree Section */
+    .agree-section {
+      text-align: center;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #eee;
+    }
+    .agree-section p {
+      font-size: 0.82rem;
+      color: var(--text-sub, #5A5A5A);
+      margin-bottom: 12px;
+    }
+    .agree-section a {
+      color: var(--green, #7B8B2E);
+      text-decoration: underline;
+    }
+    .agree-check {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .agree-check input[type="checkbox"] {
+      accent-color: var(--green, #7B8B2E);
+      width: 16px;
+      height: 16px;
+    }
+    .agree-check label {
+      font-size: 0.85rem;
+    }
+
+    /* Buttons */
+    .reg-btn-area {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .btn-confirm {
+      display: inline-block;
+      background: var(--green, #7B8B2E);
+      color: #fff;
+      padding: 14px 48px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-confirm:hover {
+      background: var(--green-light, #9AB030);
+    }
+    .btn-confirm:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .btn-send {
+      display: inline-block;
+      background: var(--green, #7B8B2E);
+      color: #fff;
+      padding: 16px 40px;
+      border: none;
+      border-radius: 30px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      box-shadow: 0 4px 12px rgba(123, 139, 46, 0.3);
+    }
+    .btn-send:hover {
+      background: var(--green-light, #9AB030);
+    }
+    .btn-back-link {
+      display: inline-block;
+      margin-left: 16px;
+      color: var(--green, #7B8B2E);
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      text-decoration: underline;
+    }
+    .btn-start {
+      display: inline-block;
+      background: var(--green, #7B8B2E);
+      color: #fff;
+      padding: 18px 48px;
+      border: none;
+      border-radius: 30px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+      box-shadow: 0 4px 12px rgba(123, 139, 46, 0.3);
+    }
+    .btn-start:hover {
+      background: var(--green-light, #9AB030);
+    }
+
+    /* Confirm Table (Step 2) */
+    .confirm-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .confirm-table tr {
+      border-bottom: 1px solid #eee;
+    }
+    .confirm-table th {
+      text-align: left;
+      padding: 14px 16px 14px 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text, #3A3A3A);
+      width: 180px;
+    }
+    .confirm-table th .req {
+      color: #C33;
+      font-size: 0.75rem;
+    }
+    .confirm-table td {
+      padding: 14px 0;
+      font-size: 0.88rem;
+      color: var(--text, #3A3A3A);
+    }
+    .confirm-agree {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.88rem;
+      color: var(--text, #3A3A3A);
+    }
+
+    /* Step 3 - Mail sent */
+    .mail-sent {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .mail-sent .mail-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+    .mail-sent h2 {
+      font-size: 1.1rem;
+      color: var(--text, #3A3A3A);
+      margin-bottom: 16px;
+    }
+    .mail-sent p {
+      font-size: 0.88rem;
+      color: var(--text-sub, #5A5A5A);
+      line-height: 1.8;
+    }
+    .mail-sent .note-box {
+      background: var(--cream, #FBF9F3);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 24px;
+      text-align: left;
+    }
+    .mail-sent .note-box h3 {
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+    .mail-sent .note-box p {
+      font-size: 0.82rem;
+      margin-bottom: 4px;
+    }
+    .mail-sent .warning {
+      color: #C33;
+      font-size: 0.82rem;
+      margin-top: 16px;
+    }
+    .mail-sent .steps-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 16px 0;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .mail-sent .steps-flow .arrow {
+      color: var(--green, #7B8B2E);
+    }
+
+    /* Step 4 - Complete */
+    .complete-section {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .complete-section h2 {
+      font-size: 1.2rem;
+      color: var(--text, #3A3A3A);
+      margin-bottom: 8px;
+    }
+    .complete-section .complete-desc {
+      font-size: 0.9rem;
+      color: var(--text-sub, #5A5A5A);
+      margin-bottom: 32px;
+    }
+    .feature-cards {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    .feature-card {
+      background: var(--green-bg, #F0F4E0);
+      border-radius: 12px;
+      padding: 24px 20px;
+      width: 240px;
+      text-align: center;
+    }
+    .feature-card .fc-icon {
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+    }
+    .feature-card h3 {
+      font-size: 0.95rem;
+      color: var(--text, #3A3A3A);
+      font-weight: 700;
+    }
+    .feature-arrow {
+      font-size: 2rem;
+      color: var(--green, #7B8B2E);
+    }
+    .premium-box {
+      background: var(--cream, #FBF9F3);
+      border: 1px solid var(--border, #E8E4D9);
+      border-radius: 8px;
+      padding: 24px;
+      margin-top: 32px;
+      text-align: center;
+    }
+    .premium-box h3 {
+      color: var(--green, #7B8B2E);
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+    .premium-box p {
+      font-size: 0.82rem;
+      color: var(--text-sub, #5A5A5A);
+      line-height: 1.6;
+    }
+
+    /* Error message */
+    .error-msg {
+      background: #FEE;
+      color: #C33;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      text-align: center;
+      display: none;
+    }
+
+    /* Hidden steps */
+    .reg-step { display: none; }
+    .reg-step.active { display: block; }
+
+    /* Social login section in step1 */
+    .social-alt {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #eee;
+      text-align: center;
+    }
+    .social-alt p {
+      font-size: 0.82rem;
+      color: #999;
+      margin-bottom: 12px;
+    }
+    .social-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .btn-google, .btn-apple {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text, #3A3A3A);
+      transition: background 0.2s;
+    }
+    .btn-google:hover, .btn-apple:hover {
+      background: #f5f5f5;
+    }
+
+    /* Back link */
+    .back-top {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .back-top a {
+      font-size: 0.82rem;
+      color: var(--text-light, #666);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .reg-card { padding: 20px 16px; }
+      .reg-form-table th { width: 120px; font-size: 0.82rem; }
+      .reg-form-table input[type="text"],
+      .reg-form-table input[type="email"],
+      .reg-form-table input[type="password"] { width: 100%; }
+      .step-item { padding: 10px 8px; font-size: 0.72rem; }
+      .step-item .step-text { display: none; }
+      .feature-cards { flex-direction: column; align-items: center; }
+      .feature-arrow { transform: rotate(90deg); }
+      .confirm-table th { width: 120px; }
+      .birthday-group select { min-width: 60px; }
+    }
+    @media (max-width: 480px) {
+      .reg-form-table,
+      .reg-form-table tbody,
+      .reg-form-table tr,
+      .reg-form-table th,
+      .reg-form-table td {
+        display: block;
+        width: 100%;
+      }
+      .reg-form-table th {
+        padding: 12px 0 4px;
+        border: none;
+      }
+      .reg-form-table td {
+        padding: 0 0 12px;
+      }
+      .reg-form-table tr {
+        padding: 8px 0;
+      }
+      .confirm-table,
+      .confirm-table tbody,
+      .confirm-table tr,
+      .confirm-table th,
+      .confirm-table td {
+        display: block;
+        width: 100%;
+      }
+      .confirm-table th { padding: 12px 0 2px; }
+      .confirm-table td { padding: 0 0 12px; }
+    }
+  </style>
 </head>
 <body>
-  <div class="auth-page">
-    <div class="auth-card">
-      <div class="logo">
-        <span class="logo-icon">B</span>
-        Body<span class="logo-accent">Pilot</span>
+  <a href="#main-content" class="skip-link">メインコンテンツにスキップ</a>
+
+  <div class="reg-page" id="main-content" role="main">
+    <!-- Header -->
+    <div class="reg-header">
+      <h1><a href="../index.html" style="color: inherit;">BodyPilot</a> &mdash; 新規会員登録</h1>
+    </div>
+
+    <!-- Step Progress Bar -->
+    <div class="step-bar" id="step-bar">
+      <div class="step-item active" data-step="1">
+        <span class="step-label">Step1</span>
+        <span class="step-text">ユーザー情報の登録</span>
       </div>
+      <div class="step-item" data-step="2">
+        <span class="step-label">Step2</span>
+        <span class="step-text">登録内容の確認</span>
+      </div>
+      <div class="step-item" data-step="3">
+        <span class="step-label">Step3</span>
+        <span class="step-text">メールの確認</span>
+      </div>
+      <div class="step-item" data-step="4">
+        <span class="step-label">Step4</span>
+        <span class="step-text">登録完了</span>
+      </div>
+    </div>
 
-      <div id="error-msg" style="display:none; background:#FEE; color:#C33; padding:10px 14px; border-radius:8px; font-size:0.85rem; margin-bottom:16px; text-align:center;"></div>
+    <div class="reg-main">
+      <!-- ===== Step 1: ユーザー情報の登録 ===== -->
+      <div class="reg-step active" id="step1">
+        <div class="reg-card">
+          <div class="reg-welcome">
+            <h2>「BodyPilot」へようこそ。</h2>
+            <p>BodyPilotは、あなたの明日の健康をサポートします。はじめに、ユーザー情報の登録をお願いします。</p>
+            <p class="required-note">※の項目は必須項目です。</p>
+          </div>
 
-      <div class="auth-section-title">無料会員登録</div>
-      <p class="auth-desc">簡単1分で登録完了。すぐに食事管理を始められます。</p>
+          <div id="error-msg" class="error-msg" role="alert" aria-live="assertive"></div>
 
-      <form id="registerForm">
-        <div class="auth-form-section">
-          <div class="form-group">
-            <label for="username">ユーザー名</label>
-            <input type="text" id="username" placeholder="ユーザー名を入力" required minlength="2">
-          </div>
-          <div class="form-group">
-            <label for="email">メールアドレス</label>
-            <input type="email" id="email" placeholder="example@mail.com" required>
-          </div>
-          <div class="form-group">
-            <label for="password">パスワード</label>
-            <input type="password" id="password" placeholder="8文字以上で入力" required minlength="8">
-          </div>
-          <div class="form-group">
-            <label for="password-confirm">パスワード(確認)</label>
-            <input type="password" id="password-confirm" placeholder="もう一度入力" required minlength="8">
+          <form id="registerForm" aria-label="新規登録フォーム" novalidate>
+            <table class="reg-form-table">
+              <tbody>
+                <tr>
+                  <th><label for="nickname">ニックネーム<span class="req">※</span></label></th>
+                  <td>
+                    <input type="text" id="nickname" required minlength="1" maxlength="15" autocomplete="username" placeholder="">
+                    <span class="field-hint">ハイフンやスペースを含め15文字以下で記入ください</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th><label for="email">メールアドレス<span class="req">※</span></label></th>
+                  <td>
+                    <input type="email" id="email" required autocomplete="email" placeholder="">
+                  </td>
+                </tr>
+                <tr>
+                  <th><label for="password">パスワード<span class="req">※</span></label></th>
+                  <td>
+                    <input type="password" id="password" required minlength="8" maxlength="40" autocomplete="new-password" placeholder="">
+                    <span class="field-hint">8〜40文字の半角英数記号で入力ください</span>
+                    <span id="password-strength" class="field-note"></span>
+                  </td>
+                </tr>
+                <tr>
+                  <th><label for="password-confirm">パスワード(確認)<span class="req">※</span></label></th>
+                  <td>
+                    <input type="password" id="password-confirm" required minlength="8" maxlength="40" autocomplete="new-password" placeholder="">
+                    <span class="field-hint">確認のため、同じパスワードを再入力</span>
+                    <span id="password-match" class="field-note"></span>
+                  </td>
+                </tr>
+                <tr>
+                  <th>性別<span class="req">※</span></th>
+                  <td>
+                    <div class="radio-group">
+                      <label><input type="radio" name="gender" value="male" checked> 男性</label>
+                      <label><input type="radio" name="gender" value="female"> 女性</label>
+                    </div>
+                    <span class="field-note">※食事診断に必要な項目です</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th><label>生年月日<span class="req">※</span></label></th>
+                  <td>
+                    <div class="birthday-group">
+                      <select id="birth-year" aria-label="生年"></select>
+                      <span>年</span>
+                      <select id="birth-month" aria-label="生月"></select>
+                      <span>月</span>
+                      <select id="birth-day" aria-label="生日"></select>
+                      <span>日</span>
+                    </div>
+                    <span class="field-note">※食事診断に必要な項目です</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th><label for="height">身長<span class="req">※</span></label></th>
+                  <td>
+                    <input type="number" id="height" min="100" max="250" step="0.1" required placeholder="">
+                    <span class="field-hint">cm</span>
+                    <span class="field-note">※食事診断に必要な項目です。小数点一桁で入力できます</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th>健康コラム・アドバイス<span class="req">※</span></th>
+                  <td>
+                    <div class="mail-group">
+                      <label><input type="radio" name="mail-pref" value="html" checked> 受け取る（HTMLメールを許可する）</label>
+                      <label><input type="radio" name="mail-pref" value="text"> 受け取る（テキストメールのみ）</label>
+                      <label><input type="radio" name="mail-pref" value="none"> 受け取らない</label>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th><label for="group-code1">グループコード(1)</label></th>
+                  <td>
+                    <input type="text" id="group-code1" maxlength="20" placeholder="">
+                    <span class="field-note">コードをお持ちのユーザー様のみ、ご入力ください</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th><label for="group-code2">グループコード(2)</label></th>
+                  <td>
+                    <input type="text" id="group-code2" maxlength="20" placeholder="">
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="agree-section">
+              <p><a href="terms.html" target="_blank">利用規約</a> と <a href="privacy.html" target="_blank">個人情報の取扱い</a> をお読みいただき、内容に同意いただける方は下記チェックをしてください。</p>
+              <div class="agree-check">
+                <input type="checkbox" id="agree-check">
+                <label for="agree-check">上記に同意する</label>
+              </div>
+            </div>
+
+            <div class="reg-btn-area">
+              <button type="submit" class="btn-confirm" id="btn-to-step2" disabled>入力内容を確認</button>
+            </div>
+          </form>
+
+          <div class="social-alt">
+            <p>または他サービスで簡単登録</p>
+            <div class="social-btns">
+              <button class="btn-google" onclick="googleRegister()" aria-label="Googleで登録">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                Googleで登録
+              </button>
+              <button class="btn-apple" onclick="appleRegister()" aria-label="Appleで登録">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#333" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                Appleで登録
+              </button>
+            </div>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary" id="register-btn">登録する</button>
-      </form>
 
-      <div class="social-section">
-        <div class="auth-section-title">他サービスで登録</div>
-        <div class="social-login">
-          <button class="btn-social" onclick="googleRegister()">
-            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-            Googleで登録
-          </button>
-          <button class="btn-social" onclick="googleRegister()">
-            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#333" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-            Appleで登録
-          </button>
+        <div class="back-top">
+          <p>すでにアカウントをお持ちの方は <a href="login.html" style="color:var(--green);font-weight:700;">ログイン</a></p>
+          <p style="margin-top:8px;"><a href="../index.html">トップに戻る</a></p>
         </div>
       </div>
 
-      <div class="auth-footer">
-        <p>すでにアカウントをお持ちの方は <a href="login.html">ログイン</a></p>
-        <p style="margin-top: 8px;"><a href="../index.html" style="color: var(--text-light);">トップに戻る</a></p>
+      <!-- ===== Step 2: 登録内容の確認 ===== -->
+      <div class="reg-step" id="step2">
+        <div class="reg-card">
+          <table class="confirm-table" id="confirm-table">
+            <tbody>
+              <tr><th>ニックネーム<span class="req">※</span></th><td id="c-nickname"></td></tr>
+              <tr><th>メールアドレス<span class="req">※</span></th><td id="c-email"></td></tr>
+              <tr><th>パスワード<span class="req">※</span></th><td id="c-password"></td></tr>
+              <tr><th>性別<span class="req">※</span></th><td id="c-gender"></td></tr>
+              <tr><th>生年月日<span class="req">※</span></th><td id="c-birthday"></td></tr>
+              <tr><th>身長<span class="req">※</span></th><td id="c-height"></td></tr>
+              <tr><th>健康コラム・アドバイス<span class="req">※</span></th><td id="c-mail-pref"></td></tr>
+              <tr><th>グループコード(1)</th><td id="c-group1"></td></tr>
+              <tr><th>グループコード(2)</th><td id="c-group2"></td></tr>
+            </tbody>
+          </table>
+
+          <div class="confirm-agree">
+            <p>会員規約と個人情報の取扱いに同意する。</p>
+          </div>
+
+          <div class="reg-btn-area">
+            <button type="button" class="btn-send" id="btn-register">本登録を完了する</button>
+            <button type="button" class="btn-back-link" onclick="goToStep(1)">入力内容を修正</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Step 3: メールの確認 ===== -->
+      <div class="reg-step" id="step3">
+        <div class="reg-card">
+          <div class="mail-sent">
+            <div class="warning" style="font-weight:700;margin-bottom:16px;">
+              ※ 会員登録は完了しておりません。下記をお読みください。
+            </div>
+            <div class="mail-icon">&#x2709;&#xFE0F;</div>
+            <h2>登録したメールアドレス宛に本登録のご案内メールを送信しました。</h2>
+            <p>届いたメール内のURLをクリックすると、本会員登録が完了します。</p>
+            <div class="steps-flow">
+              <span>[会員登録までの手順]</span>
+            </div>
+            <div class="steps-flow">
+              <span>メールの確認</span>
+              <span class="arrow">→</span>
+              <span>メール内のURLをクリック</span>
+              <span class="arrow">→</span>
+              <span style="font-weight:700;color:var(--green);">会員登録完了</span>
+            </div>
+            <div class="note-box">
+              <p class="warning">※ メールが届かない場合は以下のことが考えられます。</p>
+              <p>・フリーメールをご利用の場合、「迷惑フォルダ」に分類される場合があります。そちらもご確認ください。</p>
+              <p>・メールアドレスが入力ミスの場合</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Step 4: 登録完了 ===== -->
+      <div class="reg-step" id="step4">
+        <div class="reg-card">
+          <div class="complete-section">
+            <h2>会員登録が完了しました！</h2>
+            <p class="complete-desc">食べた食事を記録すると栄養価の過不足やアドバイスが確認できます。</p>
+
+            <div class="feature-cards">
+              <div class="feature-card">
+                <div class="fc-icon">&#x1F371;</div>
+                <h3>クリックのみの<br>簡単食事登録</h3>
+              </div>
+              <div class="feature-arrow">&#x25B6;</div>
+              <div class="feature-card">
+                <div class="fc-icon">&#x1F4CA;</div>
+                <h3>食事のアドバイス&amp;栄養価が<br>すぐにわかる</h3>
+              </div>
+            </div>
+
+            <a href="meal.html" class="btn-start">いますぐ食事診断</a>
+
+            <div class="premium-box">
+              <h3>BodyPilotをもっと便利に使おう！プレミアムサービスのご案内</h3>
+              <p>BodyPilotでは無料の基本サービスの他に、より便利にご利用いただけるプレミアムサービスをご用意しています。</p>
+              <p style="margin-top:8px;">詳しい栄養アドバイス・カスタム目標設定・データエクスポートなどの機能をお楽しみいただけます。</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- トースト通知コンテナ -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="../js/i18n.js"></script>
   <script src="../js/config.js"></script>
   <script src="../js/auth.js"></script>
+  <script src="../js/store.js"></script>
   <script>
+    // ============================================
+    // Registration Wizard Logic
+    // ============================================
+
     Auth.init();
     setTimeout(() => {
       if (Auth.isLoggedIn()) {
-        window.location.href = 'dashboard.html';
+        window.location.href = 'meal.html';
       }
     }, 200);
 
-    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+    // --- Populate birthday selects ---
+    (function initBirthdaySelects() {
+      const yearSel = document.getElementById('birth-year');
+      const monthSel = document.getElementById('birth-month');
+      const daySel = document.getElementById('birth-day');
+      const currentYear = new Date().getFullYear();
+
+      for (let y = currentYear; y >= 1920; y--) {
+        const opt = document.createElement('option');
+        opt.value = y; opt.textContent = y;
+        if (y === 2000) opt.selected = true;
+        yearSel.appendChild(opt);
+      }
+      for (let m = 1; m <= 12; m++) {
+        const opt = document.createElement('option');
+        opt.value = m; opt.textContent = m;
+        monthSel.appendChild(opt);
+      }
+      for (let d = 1; d <= 31; d++) {
+        const opt = document.createElement('option');
+        opt.value = d; opt.textContent = d;
+        daySel.appendChild(opt);
+      }
+    })();
+
+    // --- Agree checkbox enables button ---
+    document.getElementById('agree-check').addEventListener('change', function() {
+      document.getElementById('btn-to-step2').disabled = !this.checked;
+    });
+
+    // --- Password strength ---
+    document.getElementById('password').addEventListener('input', function() {
+      const el = document.getElementById('password-strength');
+      const len = this.value.length;
+      if (len === 0) { el.textContent = ''; el.className = 'field-note'; }
+      else if (len < 8) { el.textContent = '8文字以上必要です'; el.className = 'field-error'; }
+      else if (len < 12) { el.textContent = '有効なパスワードです'; el.className = 'field-note'; el.style.color = '#4CAF50'; }
+      else { el.textContent = '強力なパスワードです'; el.className = 'field-note'; el.style.color = '#4CAF50'; }
+    });
+
+    // --- Password match ---
+    document.getElementById('password-confirm').addEventListener('input', function() {
+      const el = document.getElementById('password-match');
+      const pw = document.getElementById('password').value;
+      if (this.value === '') { el.textContent = ''; el.className = 'field-note'; }
+      else if (this.value === pw) { el.textContent = '\u2713 一致しています'; el.className = 'field-note'; el.style.color = '#4CAF50'; }
+      else { el.textContent = '\u2717 パスワードが一致しません'; el.className = 'field-error'; }
+    });
+
+    // --- Step navigation ---
+    function goToStep(n) {
+      document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
+      document.getElementById('step' + n).classList.add('active');
+
+      document.querySelectorAll('.step-bar .step-item').forEach((item, i) => {
+        item.classList.remove('active', 'done');
+        if (i + 1 < n) item.classList.add('done');
+        else if (i + 1 === n) item.classList.add('active');
+      });
+
+      window.scrollTo(0, 0);
+    }
+
+    // --- Escape HTML ---
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // --- Step 1 → Step 2: Validate and show confirmation ---
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const btn = document.getElementById('register-btn');
       const errEl = document.getElementById('error-msg');
       errEl.style.display = 'none';
 
-      const username = document.getElementById('username').value;
-      const email = document.getElementById('email').value;
+      const nickname = document.getElementById('nickname').value.trim();
+      const email = document.getElementById('email').value.trim();
       const pw = document.getElementById('password').value;
       const pwConfirm = document.getElementById('password-confirm').value;
+      const height = document.getElementById('height').value;
+      const gender = document.querySelector('input[name="gender"]:checked').value;
+      const year = document.getElementById('birth-year').value;
+      const month = document.getElementById('birth-month').value;
+      const day = document.getElementById('birth-day').value;
 
-      if (pw !== pwConfirm) {
-        errEl.textContent = 'パスワードが一致しません';
-        errEl.style.display = 'block';
-        return;
-      }
+      // Validate
+      if (!nickname) { showErr('ニックネームを入力してください'); return; }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('有効なメールアドレスを入力してください'); return; }
+      if (pw.length < 8) { showErr('パスワードは8文字以上で入力してください'); return; }
+      if (pw !== pwConfirm) { showErr('パスワードが一致しません'); return; }
+      if (!height || height < 100 || height > 250) { showErr('身長を正しく入力してください（100〜250cm）'); return; }
 
-      if (pw.length < 8) {
-        errEl.textContent = 'パスワードは8文字以上で入力してください';
-        errEl.style.display = 'block';
-        return;
-      }
+      // Fill confirmation table
+      document.getElementById('c-nickname').textContent = nickname;
+      document.getElementById('c-email').textContent = email;
+      document.getElementById('c-password').textContent = '*'.repeat(pw.length);
+      document.getElementById('c-gender').textContent = gender === 'male' ? '男性' : '女性';
+      document.getElementById('c-birthday').textContent = year + '年' + month + '月' + day + '日';
+      document.getElementById('c-height').textContent = height + 'cm';
 
+      const mailPref = document.querySelector('input[name="mail-pref"]:checked').value;
+      const mailPrefText = mailPref === 'html' ? '受け取る (HTMLメールを許可する)' : mailPref === 'text' ? '受け取る (テキストメールのみ)' : '受け取らない';
+      document.getElementById('c-mail-pref').textContent = mailPrefText;
+      document.getElementById('c-group1').textContent = document.getElementById('group-code1').value || '';
+      document.getElementById('c-group2').textContent = document.getElementById('group-code2').value || '';
+
+      goToStep(2);
+    });
+
+    function showErr(msg) {
+      const errEl = document.getElementById('error-msg');
+      errEl.textContent = msg;
+      errEl.style.display = 'block';
+      errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // --- Step 2 → Register and go to Step 3 (or Step 4 for local mode) ---
+    document.getElementById('btn-register').addEventListener('click', async function() {
+      const btn = this;
       btn.textContent = '登録中...';
       btn.disabled = true;
 
+      const nickname = document.getElementById('nickname').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const pw = document.getElementById('password').value;
+      const gender = document.querySelector('input[name="gender"]:checked').value;
+      const year = document.getElementById('birth-year').value;
+      const month = document.getElementById('birth-month').value;
+      const day = document.getElementById('birth-day').value;
+      const height = parseFloat(document.getElementById('height').value);
+
       try {
-        await Auth.register(email, pw, username);
-        window.location.href = 'dashboard.html';
+        await Auth.register(email, pw, nickname);
+
+        // Save profile data
+        const uid = Auth.currentUser.uid;
+        const profile = {
+          nickname: nickname,
+          gender: gender,
+          birthYear: parseInt(year),
+          birthMonth: parseInt(month),
+          birthDay: parseInt(day),
+          height: height,
+          registeredAt: new Date().toISOString()
+        };
+        localStorage.setItem('bp_' + uid + '_profile', JSON.stringify(profile));
+
+        // Save height to Store if available
+        if (typeof Store !== 'undefined' && Store.setHeight) {
+          Store.setHeight(height);
+        }
+
+        // For local mode (no real email), skip step 3 and go to step 4
+        if (!isFirebaseConfigured) {
+          goToStep(4);
+        } else {
+          goToStep(3);
+        }
       } catch (err) {
-        errEl.textContent = err.message;
-        errEl.style.display = 'block';
-        btn.textContent = '登録する';
+        btn.textContent = '本登録を完了する';
         btn.disabled = false;
+        goToStep(1);
+        showErr(err.message);
       }
     });
 
+    // --- Social login ---
     async function googleRegister() {
       try {
         await Auth.loginWithGoogle();
-        window.location.href = 'dashboard.html';
+        window.location.href = 'meal.html';
       } catch (err) {
-        const errEl = document.getElementById('error-msg');
-        errEl.textContent = err.message;
-        errEl.style.display = 'block';
+        showErr(err.message);
       }
+    }
+
+    function appleRegister() {
+      showToast('Appleログインは近日公開予定です', 'info');
+    }
+
+    // --- Toast (minimal) ---
+    function showToast(message, type) {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = 'toast toast-' + (type || 'info');
+      toast.textContent = message;
+      toast.style.cssText = 'background:#333;color:#fff;padding:12px 20px;border-radius:8px;margin-top:8px;font-size:0.85rem;animation:fadeIn 0.3s;';
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; }, 2500);
+      setTimeout(() => toast.remove(), 3000);
+    }
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('../sw.js');
     }
   </script>
 </body>
