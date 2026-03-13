@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BodyPilot - スマホで撮るだけ食事管理</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- ヘッダー -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <span class="logo-icon">B</span>
+        Body<span class="logo-accent">Pilot</span>
+      </a>
+      <nav class="nav">
+        <a href="#about">BodyPilotとは</a>
+        <a href="#features">機能紹介</a>
+        <a href="#tips">健康コラム</a>
+        <a href="pages/register.html">新規会員登録(無料)</a>
+        <a href="pages/login.html">ログイン</a>
+      </nav>
+      <button class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== ヒーロー ===== -->
+  <section class="hero">
+    <div class="hero-logo-large">
+      <div class="logo">
+        <span class="logo-icon">B</span>
+        Body<span class="logo-accent">Pilot</span>
+      </div>
+    </div>
+    <p class="hero-tagline">カロリー・栄養素を自動で計算！</p>
+    <p class="hero-tagline-sub">ダイエットや健康のための食事管理アプリ</p>
+
+    <div class="hero-visual">
+      <div class="hero-phone-wrapper">
+        <div class="speech-bubble left">いい調子ですね</div>
+        <div class="hero-phone">
+          <div class="phone-screen">
+            <div class="screen-header">栄養素グラフ</div>
+            <div class="screen-body">
+              <div class="screen-score-box">
+                <div class="screen-score-label">今日の健康度</div>
+                <div class="screen-score-num">80<span style="font-size:0.7rem">点</span></div>
+              </div>
+              <div class="screen-bar-row">
+                <span style="width:48px">タンパク質</span>
+                <div class="screen-bar"><div class="screen-bar-fill" style="width:75%"></div></div>
+              </div>
+              <div class="screen-bar-row">
+                <span style="width:48px">脂質</span>
+                <div class="screen-bar"><div class="screen-bar-fill" style="width:58%"></div></div>
+              </div>
+              <div class="screen-bar-row">
+                <span style="width:48px">炭水化物</span>
+                <div class="screen-bar"><div class="screen-bar-fill" style="width:82%"></div></div>
+              </div>
+              <div class="screen-bar-row">
+                <span style="width:48px">ビタミン</span>
+                <div class="screen-bar"><div class="screen-bar-fill" style="width:40%"></div></div>
+              </div>
+              <div class="screen-bar-row">
+                <span style="width:48px">ミネラル</span>
+                <div class="screen-bar"><div class="screen-bar-fill" style="width:55%"></div></div>
+              </div>
+              <div class="screen-bar-row">
+                <span style="width:48px">食物繊維</span>
+                <div class="screen-bar"><div class="screen-bar-fill" style="width:35%"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="no1-badge">
+          <span class="no1-small">ダウンロード数</span>
+          <span class="no1-big">No.1</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-cta-area">
+      <p class="hero-cta-text">いますぐ<span class="free">無料</span>で始められます！</p>
+      <a href="pages/register.html" class="btn btn-primary btn-lg">無料で始める</a>
+    </div>
+  </section>
+
+  <!-- ===== 体重推移グラフ ===== -->
+  <section class="weight-section fade-in">
+    <div class="section-label-dots"></div>
+    <div class="section-label">BodyPilotを使ったダイエット効果</div>
+    <div class="weight-card">
+      <div class="weight-card-header">
+        <span class="logo-icon">B</span>
+        <span>BodyPilot ユーザーの体重の推移</span>
+      </div>
+      <div class="weight-highlight">
+        3ヶ月平均 <span class="num">4.66</span><span class="unit">kg減</span>
+      </div>
+      <div class="weight-graph">
+        <div class="graph-bar-group">
+          <div class="graph-bar" style="height:30px; background:var(--green-pale);"></div>
+          <span class="graph-label">0ヶ月</span>
+        </div>
+        <div class="graph-bar-group">
+          <div class="graph-bar" style="height:60px; background:var(--green-pale);"></div>
+          <span class="graph-label">1ヶ月</span>
+        </div>
+        <div class="graph-bar-group">
+          <div class="graph-bar" style="height:90px; background:var(--green-pale);"></div>
+          <span class="graph-label">2ヶ月</span>
+        </div>
+        <div class="graph-bar-group">
+          <div class="graph-bar" style="height:130px; background:var(--green-light);"></div>
+          <span class="graph-label">3ヶ月</span>
+        </div>
+      </div>
+      <p class="weight-desc">
+        BodyPilotユーザーの分析では、<br>
+        3ヶ月で平均4.66kg減のダイエット効果があることが分かっています。
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== BodyPilotとは？ (大きな丸アイコン) ===== -->
+  <section class="about-section" id="about">
+    <div class="section-label">BodyPilotとは？</div>
+    <div class="section-title">AIが食事を分析！<br>ダイエット・健康管理のための<br>アプリ</div>
+    <div class="about-flow">
+      <div class="about-item">
+        <div class="about-number">1</div>
+        <div class="about-circle">
+          <div class="about-circle-icon">📸</div>
+          <div class="about-circle-text">食事を記録</div>
+        </div>
+      </div>
+      <div class="about-arrow">↓</div>
+      <div class="about-item reverse">
+        <div class="about-number">2</div>
+        <div class="about-circle" style="background:#9AB030;">
+          <div class="about-circle-icon">📊</div>
+          <div class="about-circle-text">AIが栄養を<br>分析</div>
+        </div>
+      </div>
+      <div class="about-arrow">↓</div>
+      <div class="about-item">
+        <div class="about-number">3</div>
+        <div class="about-circle" style="background:#7B8B2E;">
+          <div class="about-circle-icon">💪</div>
+          <div class="about-circle-text">健康的な<br>食生活へ</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 機能紹介 (POINT形式) ===== -->
+  <section class="features" id="features">
+    <div class="point-list">
+      <!-- POINT 01 -->
+      <div class="point-item fade-in">
+        <div class="point-text">
+          <div class="point-label">POINT 01</div>
+          <h3>食後たった1分で完了！<br>簡単だから記録が続く</h3>
+          <p>スマホで食べ物を撮影するだけで、AIが食品の種類と大きさ・重さを自動で推定。食べたものを選ぶだけで、簡単にカロリー計算や栄養バランスを確認できます。すばやく食事記録できるための機能が充実しています。</p>
+        </div>
+        <div class="point-visual">
+          <div class="point-phone">
+            <div class="phone-screen">
+              <div class="screen-camera-area">
+                <div class="screen-camera-btn">📷</div>
+                <p>写真を撮影</p>
+              </div>
+              <div class="screen-result-row">
+                <div class="screen-result-item">
+                  <div class="r-label">推定重量</div>
+                  <div class="r-value">150g</div>
+                </div>
+                <div class="screen-result-item">
+                  <div class="r-label">カロリー</div>
+                  <div class="r-value">290kcal</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- POINT 02 -->
+      <div class="point-item reverse fade-in">
+        <div class="point-text">
+          <div class="point-label">POINT 02</div>
+          <h3>わかりやすい<br>栄養バランスのアドバイス</h3>
+          <p>食事を記録すると、カロリーと各種栄養素14項目の過不足がわかる栄養素グラフが、毎日無料でチェックできます。栄養バランスが整った食習慣が身につき、リバウンドしにくい健康的な食生活やダイエットが続けられます。</p>
+        </div>
+        <div class="point-visual">
+          <div class="point-phone">
+            <div class="phone-screen">
+              <div class="screen-header">栄養アドバイス</div>
+              <div class="screen-body">
+                <div class="screen-score-box">
+                  <div class="screen-score-label">あなたの健康度は？</div>
+                  <div class="screen-score-num">80<span style="font-size:0.6rem">点</span></div>
+                </div>
+                <div style="font-size:0.55rem; color:var(--text-sub); line-height:1.6; padding:4px 0;">カロリーの面から見ると摂取カロリーはちょうど良いです。やりましたね！</div>
+                <div class="screen-bar-row">
+                  <span style="width:40px">タンパク質</span>
+                  <div class="screen-bar"><div class="screen-bar-fill" style="width:72%"></div></div>
+                </div>
+                <div class="screen-bar-row">
+                  <span style="width:40px">脂質</span>
+                  <div class="screen-bar"><div class="screen-bar-fill" style="width:65%"></div></div>
+                </div>
+                <div class="screen-bar-row">
+                  <span style="width:40px">炭水化物</span>
+                  <div class="screen-bar"><div class="screen-bar-fill" style="width:80%"></div></div>
+                </div>
+                <div class="screen-bar-row">
+                  <span style="width:40px">食物繊維</span>
+                  <div class="screen-bar"><div class="screen-bar-fill" style="width:40%"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- POINT 03 -->
+      <div class="point-item fade-in">
+        <div class="point-text">
+          <div class="point-label">POINT 03</div>
+          <h3>体重や運動の記録も<br>まとめて管理</h3>
+          <p>体脂肪率や歩数、運動による消費カロリーなど、様々な情報を1つのアプリでまとめて管理できます。体重の推移グラフで日々の変化が一目でわかります。</p>
+        </div>
+        <div class="point-visual">
+          <div class="point-phone">
+            <div class="phone-screen">
+              <div class="screen-header">体重グラフ</div>
+              <div class="screen-graph-area">
+                <div style="font-size:0.6rem; color:var(--text-sub); text-align:center;">体重推移</div>
+                <div class="screen-mini-bars">
+                  <div class="screen-mini-bar" style="height:70%; background:var(--green-pale);"></div>
+                  <div class="screen-mini-bar" style="height:65%; background:var(--green-pale);"></div>
+                  <div class="screen-mini-bar" style="height:58%; background:var(--green-pale);"></div>
+                  <div class="screen-mini-bar" style="height:52%; background:var(--green-pale);"></div>
+                  <div class="screen-mini-bar" style="height:48%; background:var(--green-light);"></div>
+                  <div class="screen-mini-bar" style="height:44%; background:var(--green-light);"></div>
+                  <div class="screen-mini-bar" style="height:40%; background:var(--green);"></div>
+                </div>
+                <div class="screen-stat-row">
+                  <div class="screen-stat-box">
+                    <div class="s-label">体重</div>
+                    <div class="s-value">61.2kg</div>
+                  </div>
+                  <div class="screen-stat-box">
+                    <div class="s-label">体脂肪率</div>
+                    <div class="s-value">21.5%</div>
+                  </div>
+                </div>
+                <div class="screen-stat-row">
+                  <div class="screen-stat-box">
+                    <div class="s-label">摂取カロリー</div>
+                    <div class="s-value">1,580kcal</div>
+                  </div>
+                  <div class="screen-stat-box">
+                    <div class="s-label">消費カロリー</div>
+                    <div class="s-value">1,820kcal</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 3ステップ ===== -->
+  <section class="steps-section" id="how-it-works">
+    <div class="section-label">さっそく使ってみよう！</div>
+    <div class="section-title">たったの<span class="big">3</span>ステップで<br>使える！</div>
+    <div class="steps-grid">
+      <div class="step-card fade-in">
+        <div class="step-num">1</div>
+        <h3>会員登録</h3>
+        <p>簡単1分で完了</p>
+        <div class="step-phone-small">
+          <div class="phone-screen">
+            <div class="step-screen-icon">👋</div>
+            <div class="step-screen-text">ようこそ、<br>BodyPilotへ</div>
+            <div class="step-screen-sub">あなたの健康の未来です！</div>
+          </div>
+        </div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-card fade-in">
+        <div class="step-num">2</div>
+        <h3>なりたい姿を入力</h3>
+        <p>スキップしてもOK！</p>
+        <div class="step-phone-small">
+          <div class="phone-screen">
+            <div class="step-screen-icon">🎯</div>
+            <div class="step-screen-text">あなたに合った<br>プランを設定</div>
+            <div class="step-screen-sub">目標はいつでも変更OK</div>
+          </div>
+        </div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-card fade-in">
+        <div class="step-num">3</div>
+        <h3>食事内容の入力</h3>
+        <p>食事を選ぶだけでOK！</p>
+        <div class="step-phone-small">
+          <div class="phone-screen">
+            <div class="step-screen-icon">📷</div>
+            <div class="step-screen-text">写真を撮って<br>自動分析</div>
+            <div class="step-screen-sub">撮るだけでカロリー計算</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 栄養士アドバイスCTA ===== -->
+  <section class="nutritionist-cta">
+    <div class="nutritionist-card fade-in">
+      <h3>AIによる栄養分析の<br>アドバイスがもらえる！</h3>
+      <a href="pages/register.html" class="btn btn-primary">無料で始める</a>
+    </div>
+  </section>
+
+  <!-- ===== 体験談 ===== -->
+  <section class="testimonials">
+    <div class="section-label-dots"></div>
+    <div class="section-label">BodyPilotを使った体験談</div>
+    <div class="testimonials-count">
+      これまでに <span class="big-num">1300</span> 万人以上がBodyPilotを始めています
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card fade-in">
+        <div class="testimonial-header">
+          <div class="testimonial-avatar">👩</div>
+          <div class="testimonial-meta">
+            <div class="name">30代在宅ワーカー 女性</div>
+            <div class="result">-12kg達成</div>
+          </div>
+        </div>
+        <p>週5カップ麺だった料理嫌いの私でも、写真を撮るだけで栄養バランスがわかるので「続けられる自炊テクニック」が身につきました。</p>
+      </div>
+      <div class="testimonial-card fade-in">
+        <div class="testimonial-header">
+          <div class="testimonial-avatar">👫</div>
+          <div class="testimonial-meta">
+            <div class="name">夫婦で利用</div>
+            <div class="result">2人で合計27kg減</div>
+          </div>
+        </div>
+        <p>出会って初めて見るやせた姿が新鮮！お互いの食事記録を見せ合うことでモチベーションが続きました。</p>
+      </div>
+      <div class="testimonial-card fade-in">
+        <div class="testimonial-header">
+          <div class="testimonial-avatar">👩</div>
+          <div class="testimonial-meta">
+            <div class="name">30代女性</div>
+            <div class="result">-21kg 自己肯定感UP</div>
+          </div>
+        </div>
+        <p>運動経験ゼロから筋トレが趣味に！食事管理から始めたことで、体型だけでなくメンタルまで整いました。</p>
+      </div>
+      <div class="testimonial-card fade-in">
+        <div class="testimonial-header">
+          <div class="testimonial-avatar">👨</div>
+          <div class="testimonial-meta">
+            <div class="name">50代男性</div>
+            <div class="result">健康診断オールA</div>
+          </div>
+        </div>
+        <p>150kgから80kgに痩せて健康診断オールAに！食べ物の重さが数値で見えるようになってから人生が変わりました。</p>
+      </div>
+    </div>
+    <div class="testimonials-cta">
+      <a href="#" class="btn btn-primary">体験談をもっと見る</a>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="faq" id="faq">
+    <div class="section-label-dots"></div>
+    <div class="section-label">あなたの疑問を解消します</div>
+    <div class="section-title">よくあるご質問</div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-question">
+          <span class="q-icon">Q</span>
+          <span class="q-text">無料で利用できますか？</span>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">はい、基本機能はすべて無料でご利用いただけます。食事の撮影・分析・記録・栄養バランスのグラフ表示は無料プランに含まれています。より詳細なアドバイスやカスタムプランはプレミアムプランでご利用いただけます。</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          <span class="q-icon">Q</span>
+          <span class="q-text">BodyPilotはどんなサービスですか？</span>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">スマホで食べ物を撮影するだけで、AIが食品の種類・大きさ・重さを推定し、カロリーや栄養素を自動計算する健康管理サービスです。毎日の栄養バランスをグラフで確認でき、健康的な食生活をサポートします。</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          <span class="q-icon">Q</span>
+          <span class="q-text">スマホから利用できますか？</span>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">はい、スマホのブラウザからそのままご利用いただけます。iPhone・Android両方に対応しており、カメラ機能を使って食事を撮影できます。</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          <span class="q-icon">Q</span>
+          <span class="q-text">体重や食事内容を人に見られたくないのですが、プライバシー面は安全ですか？</span>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">お客様の食事データは暗号化して保管しており、他のユーザーに公開されることはありません。公開設定はすべてご自身で管理できます。安心してご利用ください。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 健康コラム ===== -->
+  <section class="health-tips" id="tips">
+    <div class="section-label-dots"></div>
+    <div class="section-label">ダイエットしたい人必見！お役立ちコンテンツ</div>
+    <div class="section-title">健康コラム</div>
+    <div class="tips-tags">
+      <span class="tip-tag active">ダイエット継続</span>
+      <span class="tip-tag">たんぱく質不足解消</span>
+      <span class="tip-tag">筋トレしたい</span>
+      <span class="tip-tag">減塩</span>
+      <span class="tip-tag">睡眠ケア</span>
+    </div>
+    <div class="tips-grid">
+      <div class="tip-card fade-in">
+        <div class="tip-image">🍙</div>
+        <div class="tip-body">
+          <div class="tip-category">記事</div>
+          <h4>朝ご飯抜きは太る原因に？ダイエットに欠かせない理由と疑問を解決</h4>
+          <div class="tip-meta">#食生活改善</div>
+        </div>
+      </div>
+      <div class="tip-card fade-in">
+        <div class="tip-image">🥗</div>
+        <div class="tip-body">
+          <div class="tip-category">記事</div>
+          <h4>ダイエッターに「そば」が人気！栄養バランスを整うおすすめカスタマイズ</h4>
+          <div class="tip-meta">#食生活改善</div>
+        </div>
+      </div>
+      <div class="tip-card fade-in">
+        <div class="tip-image">🏋️</div>
+        <div class="tip-body">
+          <div class="tip-category">動画</div>
+          <h4>座ってできる内ももトレーニング！在宅ワーカー向けエクササイズ</h4>
+          <div class="tip-meta">#部分トレーニング</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="cta">
+    <div class="section-label-dots"></div>
+    <div class="section-label">BodyPilotを試そうか迷っている方へ</div>
+    <h2>まずは「簡単カロリー<br>・栄養素計算」<br>を試してみませんか？</h2>
+    <p>無料で食事管理をスタートできます</p>
+    <a href="pages/register.html" class="btn btn-primary btn-lg">簡単カロリー・栄養素計算を使ってみる</a>
+    <br>
+    <a href="#" class="cta-sub-link">「健康を考えるブランド」を持つ企業様へ</a>
+  </section>
+
+  <!-- ===== フッター ===== -->
+  <footer class="footer">
+    <div class="footer-app-bar">
+      <div class="footer-app-inner">
+        <div class="footer-app-text">
+          <div class="logo">
+            <span class="logo-icon">B</span>
+            Body<span class="logo-accent">Pilot</span>
+          </div>
+          <p>ダイエットや健康のための食事管理アプリ<br>カロリー・栄養素を自動で計算！</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer-links">
+      <div class="footer-links-inner">
+        <div class="footer-links-grid">
+          <div>
+            <h4>サービス</h4>
+            <a href="#">簡単/無料カロリー計算</a>
+            <a href="#">ダイエット日記</a>
+            <a href="#">みんなの日記</a>
+          </div>
+          <div>
+            <h4>コラム</h4>
+            <a href="#">健康コラム</a>
+            <a href="#">レシピ</a>
+            <a href="#">動画</a>
+          </div>
+          <div>
+            <h4>レシピ</h4>
+            <a href="#">野菜のおかず</a>
+            <a href="#">肉のおかず</a>
+            <a href="#">魚のおかず</a>
+            <a href="#">ごはん・めん</a>
+          </div>
+          <div>
+            <h4>その他</h4>
+            <a href="#">ショップ</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-legal">
+      <div class="footer-legal-inner">
+        <a href="#">利用規約</a>
+        <a href="#">プライバシーポリシー</a>
+        <a href="#">個人情報保護方針</a>
+        <a href="#">FAQ・問い合わせ</a>
+        <a href="#">運営会社について</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 BodyPilot Inc.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

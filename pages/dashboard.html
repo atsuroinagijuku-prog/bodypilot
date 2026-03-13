@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ダッシュボード - BodyPilot</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+  <!-- ヘッダー -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="dashboard.html" class="logo">
+        <span class="logo-icon">B</span>
+        Body<span class="logo-accent">Pilot</span>
+      </a>
+      <nav class="nav">
+        <a href="dashboard.html" style="color:var(--green); font-weight:700;">ダッシュボード</a>
+        <a href="#">レポート</a>
+        <a href="#">設定</a>
+        <a href="#" onclick="handleLogout(); return false;">ログアウト</a>
+      </nav>
+      <button class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="dashboard">
+    <div class="dashboard-header">
+      <div>
+        <h2><span id="user-name"></span> の食事記録</h2>
+        <span class="date-display" id="today-date"></span>
+      </div>
+      <div class="health-score-badge">
+        <span class="score-label">健康スコア</span>
+        <span class="score-num" id="health-score">0</span>
+        <span class="score-unit">点</span>
+      </div>
+    </div>
+
+    <!-- サマリーカード -->
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="label">摂取カロリー</div>
+        <div class="value" id="sum-cal">0</div>
+        <div class="unit" id="sum-cal-goal">/ 2,000 kcal</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">タンパク質</div>
+        <div class="value" id="sum-protein">0</div>
+        <div class="unit" id="sum-protein-goal">/ 80 g</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">脂質</div>
+        <div class="value" id="sum-fat">0</div>
+        <div class="unit" id="sum-fat-goal">/ 65 g</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">炭水化物</div>
+        <div class="value" id="sum-carb">0</div>
+        <div class="unit" id="sum-carb-goal">/ 250 g</div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <!-- 左カラム: 食事記録 -->
+      <div class="card">
+        <div class="card-title">食事を記録する</div>
+
+        <!-- タブ -->
+        <div class="record-tabs">
+          <button class="record-tab active" onclick="switchTab('photo')">写真で記録</button>
+          <button class="record-tab" onclick="switchTab('search')">食品を検索</button>
+        </div>
+
+        <!-- 写真撮影 -->
+        <div id="tab-photo" class="tab-content active">
+          <div class="upload-area" id="upload-area">
+            <div class="upload-icon">📷</div>
+            <p>写真を撮影またはアップロード</p>
+            <p class="upload-hint">タップでカメラ起動、またはファイルを選択</p>
+            <input type="file" id="file-input" accept="image/*" capture="environment" style="display:none;">
+          </div>
+
+          <div id="analyzing" style="display:none; text-align:center; padding:36px;">
+            <div class="spinner"></div>
+            <p style="margin-top:12px; color:var(--text-sub);">AIが分析中...</p>
+          </div>
+
+          <div id="photo-result" style="display:none;">
+            <div class="photo-result-card">
+              <img id="preview-img" src="" alt="撮影した写真" class="preview-image">
+              <div class="result-details">
+                <h3 id="photo-food-name"></h3>
+                <div class="result-weight">推定重量: <strong id="photo-food-weight"></strong></div>
+                <div class="result-nutrients">
+                  <div class="rn-item"><span class="rn-label">カロリー</span><span class="rn-value" id="photo-food-cal"></span></div>
+                  <div class="rn-item"><span class="rn-label">タンパク質</span><span class="rn-value" id="photo-food-protein"></span></div>
+                  <div class="rn-item"><span class="rn-label">脂質</span><span class="rn-value" id="photo-food-fat"></span></div>
+                  <div class="rn-item"><span class="rn-label">炭水化物</span><span class="rn-value" id="photo-food-carb"></span></div>
+                </div>
+                <div class="result-actions">
+                  <button class="btn btn-primary btn-sm" id="btn-save-photo" onclick="savePhotoResult()">記録する</button>
+                  <button class="btn btn-outline-white btn-sm" onclick="resetUpload()">やり直す</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 食品検索 -->
+        <div id="tab-search" class="tab-content">
+          <div class="search-box">
+            <input type="text" id="food-search" placeholder="食品名を入力（例: おにぎり、唐揚げ）">
+          </div>
+          <div class="search-tabs">
+            <button class="search-tab active" data-category="all">人気順</button>
+            <button class="search-tab" data-category="ごはん">ごはん</button>
+            <button class="search-tab" data-category="めん">めん</button>
+            <button class="search-tab" data-category="肉">肉</button>
+            <button class="search-tab" data-category="魚">魚</button>
+            <button class="search-tab" data-category="サラダ">サラダ</button>
+          </div>
+          <div id="search-results" class="search-results"></div>
+        </div>
+      </div>
+
+      <!-- 右カラム: 栄養バランス & 体重 -->
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <div class="card">
+          <div class="card-title">今日の栄養バランス</div>
+          <div class="nutrition-bars">
+            <div class="nutrition-row">
+              <span class="nutrition-label">タンパク質</span>
+              <div class="nutrition-bar"><div class="nutrition-fill protein" id="bar-protein" style="width:0%"></div></div>
+              <span class="nutrition-value" id="val-protein">0/80g</span>
+            </div>
+            <div class="nutrition-row">
+              <span class="nutrition-label">脂質</span>
+              <div class="nutrition-bar"><div class="nutrition-fill fat" id="bar-fat" style="width:0%"></div></div>
+              <span class="nutrition-value" id="val-fat">0/65g</span>
+            </div>
+            <div class="nutrition-row">
+              <span class="nutrition-label">炭水化物</span>
+              <div class="nutrition-bar"><div class="nutrition-fill carb" id="bar-carb" style="width:0%"></div></div>
+              <span class="nutrition-value" id="val-carb">0/250g</span>
+            </div>
+            <div class="nutrition-row">
+              <span class="nutrition-label">食物繊維</span>
+              <div class="nutrition-bar"><div class="nutrition-fill fiber" id="bar-fiber" style="width:0%"></div></div>
+              <span class="nutrition-value" id="val-fiber">0/20g</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">体重を記録</div>
+          <form id="weight-form" class="weight-form">
+            <div class="weight-inputs">
+              <div class="weight-field">
+                <label>体重 (kg)</label>
+                <input type="number" id="weight-input" step="0.1" min="20" max="300" placeholder="60.0" required>
+              </div>
+              <div class="weight-field">
+                <label>体脂肪率 (%)</label>
+                <input type="number" id="bodyfat-input" step="0.1" min="1" max="60" placeholder="20.0">
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm">記録</button>
+            </div>
+          </form>
+          <div id="weight-chart" class="weight-chart-container"></div>
+        </div>
+      </div>
+
+      <!-- 食事ログ (全幅) -->
+      <div class="card" style="grid-column: 1 / -1;">
+        <div class="card-title">今日の食事</div>
+        <div id="meal-log" class="meal-log"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 食品追加モーダル -->
+  <div class="modal-overlay" id="add-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-food-name">食品名</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>量 (g)</label>
+          <input type="number" id="modal-weight" value="100" min="1" max="2000" oninput="updateModalPreview()">
+          <input type="hidden" id="modal-food-id">
+        </div>
+        <div class="modal-preview">
+          <span id="modal-cal">0 kcal</span>
+          <span id="modal-protein">P: 0g</span>
+          <span id="modal-fat">F: 0g</span>
+          <span id="modal-carb">C: 0g</span>
+        </div>
+        <div class="weight-quick-btns">
+          <button onclick="document.getElementById('modal-weight').value=50; updateModalPreview()">50g</button>
+          <button onclick="document.getElementById('modal-weight').value=100; updateModalPreview()">100g</button>
+          <button onclick="document.getElementById('modal-weight').value=150; updateModalPreview()">150g</button>
+          <button onclick="document.getElementById('modal-weight').value=200; updateModalPreview()">200g</button>
+          <button onclick="document.getElementById('modal-weight').value=300; updateModalPreview()">300g</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="addFoodFromModal()">記録する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- トースト用 -->
+
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/food-db.js"></script>
+  <script src="../js/store.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/dashboard.js"></script>
+  <script>
+    // タブ切り替え
+    function switchTab(name) {
+      document.querySelectorAll('.record-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('tab-' + name).classList.add('active');
+    }
+  </script>
+</body>
+</html>
