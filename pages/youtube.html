@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube字幕・文字起こし - BodyPilot</title>
+  <meta name="description" content="YouTubeチャンネルの動画から字幕を取得、または音声から文字起こしを行うツール。健康・栄養系動画の内容をテキスト化。">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#7B8B2E">
+  <link rel="icon" type="image/svg+xml" href="../images/icon-192.svg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/app.css">
+  <script>
+    (function() {
+      var saved = localStorage.getItem('bp_theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    })();
+  </script>
+  <style>
+    .yt-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 100px 20px 60px;
+    }
+    .yt-title {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .yt-title h1 {
+      font-size: 1.6rem;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .yt-title .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+    .yt-section {
+      margin-top: 32px;
+    }
+    .yt-section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 12px;
+      padding-left: 12px;
+      border-left: 4px solid var(--green);
+    }
+    .yt-input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .yt-input-group input {
+      flex: 1;
+      padding: 14px 16px;
+      font-size: 1rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--input-bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .yt-input-group input:focus {
+      border-color: var(--green);
+    }
+    .yt-input-group .btn-action {
+      padding: 14px 28px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .yt-input-group .btn-action:hover {
+      background: var(--green-light);
+    }
+    .yt-input-group .btn-action:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .yt-help-text {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-bottom: 8px;
+    }
+    .yt-mode-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 20px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 2px solid var(--green);
+    }
+    .yt-mode-tab {
+      flex: 1;
+      padding: 12px 16px;
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--white);
+      color: var(--green);
+      border: none;
+      transition: all 0.2s;
+    }
+    .yt-mode-tab.active {
+      background: var(--green);
+      color: #fff;
+    }
+    .yt-mode-tab:hover:not(.active) {
+      background: var(--green-bg);
+    }
+    .yt-panel {
+      display: none;
+    }
+    .yt-panel.active {
+      display: block;
+    }
+    .yt-command-box {
+      background: var(--bg-secondary, #1e1e2e);
+      color: #e0e0e0;
+      padding: 16px 20px;
+      border-radius: var(--radius);
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      position: relative;
+      margin-bottom: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .yt-command-box .comment {
+      color: #6a9955;
+    }
+    .yt-command-box .cmd {
+      color: #dcdcaa;
+    }
+    .yt-command-box .flag {
+      color: #9cdcfe;
+    }
+    .yt-command-box .string {
+      color: #ce9178;
+    }
+    .btn-copy {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 4px 12px;
+      background: rgba(255,255,255,0.15);
+      color: #e0e0e0;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-copy:hover {
+      background: rgba(255,255,255,0.25);
+    }
+    .yt-video-list {
+      margin-top: 16px;
+    }
+    .yt-video-item {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .yt-video-item:hover {
+      box-shadow: var(--shadow-sm);
+    }
+    .yt-video-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      cursor: pointer;
+    }
+    .yt-video-title {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 0.95rem;
+      flex: 1;
+    }
+    .yt-video-meta {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-left: 12px;
+      white-space: nowrap;
+    }
+    .yt-video-detail {
+      display: none;
+      padding: 0 16px 16px;
+      border-top: 1px solid var(--border);
+    }
+    .yt-video-detail.open {
+      display: block;
+    }
+    .yt-subtitle-text {
+      background: var(--bg-secondary, #f8f8f8);
+      padding: 16px;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      line-height: 1.8;
+      color: var(--text);
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .yt-subtitle-text .timestamp {
+      color: var(--green);
+      font-weight: 600;
+      font-size: 0.8rem;
+      margin-right: 8px;
+    }
+    .yt-status {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+    .yt-status .icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    .yt-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+    .yt-badge-sub {
+      background: var(--green-bg);
+      color: var(--green);
+    }
+    .yt-badge-nosub {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .yt-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .yt-options label {
+      font-size: 0.85rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .yt-options select {
+      padding: 6px 12px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      background: var(--input-bg);
+      color: var(--text);
+      outline: none;
+    }
+    .yt-options select:focus {
+      border-color: var(--green);
+    }
+    .yt-result-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .yt-result-actions button {
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+    .btn-download {
+      background: var(--green);
+      color: #fff;
+    }
+    .btn-download:hover {
+      background: var(--green-light);
+    }
+    .btn-copy-text {
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid var(--green) !important;
+    }
+    .btn-copy-text:hover {
+      background: var(--green);
+      color: #fff;
+    }
+    .yt-saved-list {
+      margin-top: 16px;
+    }
+    .yt-saved-item {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .yt-saved-info {
+      flex: 1;
+    }
+    .yt-saved-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+    .yt-saved-date {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+    .yt-saved-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .yt-saved-actions button {
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-view {
+      background: var(--green-bg);
+      color: var(--green);
+    }
+    .btn-delete {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .help-toggle {
+      display: inline-block;
+      margin: 16px auto;
+      padding: 8px 20px;
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid var(--green);
+      border-radius: var(--radius-pill);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .help-toggle:hover {
+      background: var(--green);
+      color: #fff;
+    }
+    .help-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--modal-overlay-bg);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .help-modal-content {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      max-width: 600px;
+      width: 100%;
+      position: relative;
+      box-shadow: var(--shadow-lg);
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .help-modal-content h3 {
+      font-size: 1.1rem;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+    .help-modal-content p {
+      font-size: 0.9rem;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+      line-height: 1.7;
+    }
+    .help-modal-content strong {
+      color: var(--green);
+    }
+    .help-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-light);
+    }
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--green);
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: var(--radius-pill);
+      font-size: 0.9rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 9999;
+      pointer-events: none;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    @media (max-width: 600px) {
+      .yt-container {
+        padding: 80px 12px 40px;
+      }
+      .yt-title h1 {
+        font-size: 1.3rem;
+      }
+      .yt-input-group {
+        flex-direction: column;
+      }
+      .yt-input-group .btn-action {
+        padding: 12px 18px;
+      }
+      .yt-mode-tabs {
+        flex-direction: column;
+      }
+      .yt-options {
+        flex-direction: column;
+      }
+      .yt-video-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+      .yt-video-meta {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">メインコンテンツにスキップ</a>
+  <!-- ヘッダー -->
+  <header class="app-header">
+    <a href="../index.html" class="app-logo">🍏 BodyPilot</a>
+    <div class="app-user-area">
+      <span id="user-name"></span>
+      <a href="register.html" class="header-link" id="nav-register">新規登録</a>
+      <a href="login.html" class="header-link" id="nav-login">ログイン</a>
+      <a href="settings.html" class="header-link" id="nav-settings" style="display:none;">⚙️</a>
+      <button onclick="handleLogout()" class="logout-btn" id="nav-logout" style="display:none;">ログアウト</button>
+    </div>
+  </header>
+
+  <!-- アプリ内ナビ -->
+  <nav class="app-nav">
+    <a href="meal.html" class="app-nav-item">食事記録</a>
+    <a href="diary.html" class="app-nav-item">日記</a>
+    <a href="graph.html" class="app-nav-item">グラフ</a>
+    <a href="goals.html" class="app-nav-item">目標設定</a>
+    <a href="calculator.html" class="app-nav-item">簡単カロリー計算</a>
+    <a href="youtube.html" class="app-nav-item active">YouTube字幕</a>
+  </nav>
+
+  <div class="yt-container" role="main" id="main-content">
+    <!-- Title -->
+    <div class="yt-title">
+      <h1>YouTube字幕・文字起こしツール</h1>
+      <p class="subtitle">YouTube Subtitle & Transcription Tool</p>
+    </div>
+
+    <div style="text-align:center;">
+      <button class="help-toggle" onclick="toggleHelp()">使い方を見る</button>
+    </div>
+
+    <!-- Mode Tabs -->
+    <div class="yt-section">
+      <div class="yt-mode-tabs">
+        <button class="yt-mode-tab active" onclick="switchMode('subtitle')" id="tab-subtitle">字幕取得（字幕あり動画）</button>
+        <button class="yt-mode-tab" onclick="switchMode('whisper')" id="tab-whisper">音声→文字起こし（字幕なし）</button>
+        <button class="yt-mode-tab" onclick="switchMode('saved')" id="tab-saved">保存済み</button>
+      </div>
+
+      <!-- Panel: Subtitle Download -->
+      <div class="yt-panel active" id="panel-subtitle">
+        <div class="yt-section-title">字幕付き動画の字幕を取得</div>
+        <p class="yt-help-text">YouTubeの動画URL またはチャンネルURLを入力してください。自動字幕・手動字幕を取得します。</p>
+
+        <div class="yt-options">
+          <label>
+            字幕言語:
+            <select id="sub-lang">
+              <option value="ja" selected>日本語 (ja)</option>
+              <option value="en">英語 (en)</option>
+              <option value="ko">韓国語 (ko)</option>
+              <option value="zh">中国語 (zh)</option>
+              <option value="es">スペイン語 (es)</option>
+              <option value="fr">フランス語 (fr)</option>
+            </select>
+          </label>
+          <label>
+            字幕種類:
+            <select id="sub-type">
+              <option value="auto" selected>自動字幕 (auto-sub)</option>
+              <option value="manual">手動字幕 (sub)</option>
+              <option value="both">両方</option>
+            </select>
+          </label>
+          <label>
+            出力形式:
+            <select id="sub-format">
+              <option value="srt" selected>SRT</option>
+              <option value="vtt">VTT</option>
+              <option value="txt">テキスト（タイムスタンプなし）</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="yt-input-group">
+          <input type="text" id="subtitle-url" placeholder="https://www.youtube.com/watch?v=... または チャンネルURL" aria-label="YouTube URL">
+          <button class="btn-action" id="btn-gen-subtitle" onclick="generateSubtitleCommand()">コマンド生成</button>
+        </div>
+
+        <div id="subtitle-result"></div>
+      </div>
+
+      <!-- Panel: Whisper Transcription -->
+      <div class="yt-panel" id="panel-whisper">
+        <div class="yt-section-title">音声ダウンロード＋Whisper文字起こし</div>
+        <p class="yt-help-text">字幕がない動画の場合、音声をダウンロードしてWhisperで文字起こしします。</p>
+
+        <div class="yt-options">
+          <label>
+            音声形式:
+            <select id="audio-format">
+              <option value="mp3" selected>MP3</option>
+              <option value="wav">WAV</option>
+              <option value="m4a">M4A</option>
+            </select>
+          </label>
+          <label>
+            Whisper言語:
+            <select id="whisper-lang">
+              <option value="Japanese" selected>日本語</option>
+              <option value="English">英語</option>
+              <option value="Korean">韓国語</option>
+              <option value="Chinese">中国語</option>
+            </select>
+          </label>
+          <label>
+            Whisperモデル:
+            <select id="whisper-model">
+              <option value="base">base（高速）</option>
+              <option value="small">small</option>
+              <option value="medium" selected>medium（推奨）</option>
+              <option value="large">large（高精度）</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="yt-input-group">
+          <input type="text" id="whisper-url" placeholder="https://www.youtube.com/watch?v=... または チャンネルURL" aria-label="YouTube URL">
+          <button class="btn-action" id="btn-gen-whisper" onclick="generateWhisperCommand()">コマンド生成</button>
+        </div>
+
+        <div id="whisper-result"></div>
+      </div>
+
+      <!-- Panel: Saved Transcriptions -->
+      <div class="yt-panel" id="panel-saved">
+        <div class="yt-section-title">保存済み文字起こしデータ</div>
+        <p class="yt-help-text">手動で文字起こし結果を貼り付けて保存できます。</p>
+
+        <div class="yt-input-group">
+          <input type="text" id="save-title" placeholder="動画タイトルを入力" aria-label="動画タイトル">
+        </div>
+        <textarea id="save-text" rows="6" placeholder="字幕テキストまたは文字起こし結果を貼り付け..." style="width:100%;padding:14px 16px;font-size:0.9rem;border:2px solid var(--border);border-radius:var(--radius);background:var(--input-bg);color:var(--text);outline:none;resize:vertical;font-family:inherit;line-height:1.7;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+        <div style="margin-top:8px;">
+          <button class="btn-action" onclick="saveTranscription()">保存する</button>
+        </div>
+
+        <div id="saved-list" class="yt-saved-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div class="help-modal-overlay" id="help-modal" onclick="if(event.target===this)toggleHelp()">
+    <div class="help-modal-content">
+      <button class="help-close" onclick="toggleHelp()">&times;</button>
+      <h3>YouTube字幕・文字起こしツールの使い方</h3>
+      <p>このツールは、YouTube動画の字幕取得や音声からの文字起こしに必要なコマンドを生成します。</p>
+      <p><strong>事前準備（ローカルPC）:</strong></p>
+      <p>1. <strong>yt-dlp</strong> をインストール:<br>
+        <code>pip install yt-dlp</code> または <code>brew install yt-dlp</code></p>
+      <p>2. <strong>Whisper</strong> をインストール（文字起こし用）:<br>
+        <code>pip install openai-whisper</code></p>
+      <p><strong>使い方:</strong></p>
+      <p><strong>1. 字幕取得（字幕あり動画）</strong><br>
+        動画に字幕がある場合、yt-dlpで字幕ファイルを直接ダウンロードします。自動生成字幕・手動字幕のどちらにも対応。</p>
+      <p><strong>2. 音声→文字起こし（字幕なし）</strong><br>
+        字幕がない動画の場合、まず音声をMP3でダウンロードし、Whisperで文字起こしします。</p>
+      <p><strong>3. 保存済み</strong><br>
+        取得した文字起こし結果をアプリ内に保存・管理できます。</p>
+    </div>
+  </div>
+
+  <!-- トースト通知 -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/store.js"></script>
+  <script src="../js/youtube.js"></script>
+  <script>
+  Auth.init();
+  if (!Auth.isLoggedIn()) {
+    window.location.href = 'login.html';
+  }
+  </script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('../sw.js');
+  }
+  </script>
+</body>
+</html>

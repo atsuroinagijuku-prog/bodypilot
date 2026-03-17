@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'bodypilot-v3';
+const CACHE_VERSION = 'bodypilot-v4';
 const STATIC_CACHE = CACHE_VERSION + '-static';
 const DYNAMIC_CACHE = CACHE_VERSION + '-dynamic';
 
@@ -27,6 +27,8 @@ const APP_SHELL = [
   '/js/settings.js',
   '/js/reports.js',
   '/js/vision-api.js',
+  '/js/youtube.js',
+  '/pages/youtube.html',
   '/manifest.json',
   '/offline.html'
 ];
